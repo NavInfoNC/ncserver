@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ncserver", "ncserver.vcxproj", "{7F0B7C1E-ECB0-490D-945F-F7420E0DCAC8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "example", "..\example\echo.vcxproj", "{CB829EDA-B4FE-447C-8CE8-1E1A67E2CE5A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ncserver_test", "ncserver_test.vcxproj", "{4C6F142A-B373-4281-84AC-D4C302BFD03F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F0B7C1E-ECB0-490D-945F-F7420E0DCAC8}.Debug|x64.ActiveCfg = Debug|x64
+		{7F0B7C1E-ECB0-490D-945F-F7420E0DCAC8}.Debug|x64.Build.0 = Debug|x64
+		{7F0B7C1E-ECB0-490D-945F-F7420E0DCAC8}.Release|x64.ActiveCfg = Release|x64
+		{7F0B7C1E-ECB0-490D-945F-F7420E0DCAC8}.Release|x64.Build.0 = Release|x64
+		{CB829EDA-B4FE-447C-8CE8-1E1A67E2CE5A}.Debug|x64.ActiveCfg = Debug|x64
+		{CB829EDA-B4FE-447C-8CE8-1E1A67E2CE5A}.Debug|x64.Build.0 = Debug|x64
+		{CB829EDA-B4FE-447C-8CE8-1E1A67E2CE5A}.Release|x64.ActiveCfg = Release|x64
+		{CB829EDA-B4FE-447C-8CE8-1E1A67E2CE5A}.Release|x64.Build.0 = Release|x64
+		{4C6F142A-B373-4281-84AC-D4C302BFD03F}.Debug|x64.ActiveCfg = Debug|x64
+		{4C6F142A-B373-4281-84AC-D4C302BFD03F}.Debug|x64.Build.0 = Debug|x64
+		{4C6F142A-B373-4281-84AC-D4C302BFD03F}.Release|x64.ActiveCfg = Release|x64
+		{4C6F142A-B373-4281-84AC-D4C302BFD03F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,10 @@
+/lib
+/obj
+/tmp
+*.user
+*.opensdf
+*.sdf
+*.suo
+/config/ipch
+/dependency/nginx-1.7.2/logs
+/_build

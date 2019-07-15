@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="fcgi">
+      <UniqueIdentifier>{9b406935-70f1-4425-8758-a76ce0ec894a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="gtest">
+      <UniqueIdentifier>{3807a002-1a6d-454b-bfd9-6e857aeedb9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{ebbc52a9-bda0-48cc-8b06-8cec6dc6bbf5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\fcgi_bind.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\fcgi_service_io.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\util.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fcgi_stdio.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fcgiapp.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fcgimisc.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fcgio.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fcgios.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fastcgi.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fcgi_config.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fastcgi\include\fcgi_config_x86.h">
+      <Filter>fcgi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ncserver.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\stdafx.h">
+      <Filter>test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gtest\gtest.h">
+      <Filter>gtest</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\fcgi_bind.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\util.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\fcgi_service_io.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fastcgi\libfcgi\fcgiapp.c">
+      <Filter>fcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fastcgi\libfcgi\fcgio.cpp">
+      <Filter>fcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fastcgi\libfcgi\os_unix.c">
+      <Filter>fcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fastcgi\libfcgi\os_win32.c">
+      <Filter>fcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fastcgi\libfcgi\fcgi_stdio.c">
+      <Filter>fcgi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ncserver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\static_string_map.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\request_unittest.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\main.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\stdafx.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gtest\gtest-all.cc">
+      <Filter>gtest</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ReadMe.rst" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\CMakeLists.txt" />
+  </ItemGroup>
+</Project>
