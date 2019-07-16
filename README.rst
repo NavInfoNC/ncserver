@@ -1,16 +1,17 @@
 ncserver
 ========
 
-ncserver是基于FastCGI和Nginx的一个在线功能的开发框架。
-使用此框架，可以方便的开发出在线搜索、算路、TMC等服务。
+ncserver是基于FastCGI和Nginx的一个C++在线服务开发框架。
+在NavInfo，它是我们开发出搜索、算路、路况等服务的基础。
 
 .. image:: docs/architecture.png
 
-ncserver包括以下文件：
+本项目包括：
 
-* ncserver.h
-* ncserver.lib(or libncserver.a)
-* ncserver.sh启动脚本。
+1. 源代码。可以编译为静态库使用。也可以直接加入工程使用。
+2. 服务管理脚本 ncserverctl
+3. 一个 example 程序。见 "example" 目录。
+4. 预先配置好的Windows版Nginx，方便测试。见dependency目录。
 
 ncserver支持Linux和Windows。Windows只能用于功能调试，不能提供多进程支持和好的性能。
 Linux用于压力测试和正式产品部署。
@@ -20,24 +21,22 @@ Window下编译&测试
 
 按照以下步骤编译和测试。
 
-1. 配置dependency/nginx-1.7.2/conf/nginx.conf
+1. 配置dependency/nginx-1.7.2/conf/nginx.conf::
 
-	::	
+      location ~ /echo {
+            root           html;
+            fastcgi_pass   127.0.0.1:9009;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+            include        fastcgi_params;
+         }
 
-		location ~ /echo {
-				root           html;
-				fastcgi_pass   127.0.0.1:9009;
-				fastcgi_index  index.php;
-				fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
-				include        fastcgi_params;
-			}
-
-	.. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
-		本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
+      .. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
+         本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
 
 2. 启动dependency/nginx-1.7.2/nginx.exe。
 
-	.. warning:: nginx.exe只能双击一次，否则会出现问题。必须用nginx -s stop停止。用nginx -s reload重新加载配置。
+   .. warning:: nginx.exe只能双击一次，否则会出现问题。必须用nginx -s stop停止。用nginx -s reload重新加载配置。
 
 3. 直接打开config的sln文件。编译。按F5运行example。
 4. 运行test.py。或者直接访问http://127.0.0.1/echo?text=abc
@@ -49,32 +48,32 @@ Ubuntu下编译&测试
 
 .. code-block:: bash
 
-	$ sudo vim /etc/nginx/conf.d/default.conf
+   $ sudo vim /etc/nginx/conf.d/default.conf
 
-	location ~ /echo {
-		root           html;
-		fastcgi_pass   unix:/tmp/echo.sock;
-		fastcgi_index  index.php;
-		fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
-		include        fastcgi_params;
-	}
+   location ~ /echo {
+      root           html;
+      fastcgi_pass   unix:/tmp/echo.sock;
+      fastcgi_index  index.php;
+      fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+      include        fastcgi_params;
+   }
 
-	$ sudo nginx -s reload
+   $ sudo nginx -s reload
 
 运行以下命令，编译ncserver的lib和测试程序echo。
 
 .. code-block:: bash
 
-	$ python make.py
-	$ ./ncserver.sh -s start -m lib/echo.out -d /tmp/echo.sock
-	Starting lib/echo.out, threadCount= ...
-	spawn-fcgi: child spawned successfully: PID: 32592
-	$ python test.py
-	.
-	----------------------------------------------------------------------
-	Ran 1 test in 0.004s
+   $ python make.py
+   $ ./ncserver.sh -s start -m lib/echo.out -d /tmp/echo.sock
+   Starting lib/echo.out, threadCount= ...
+   spawn-fcgi: child spawned successfully: PID: 32592
+   $ python test.py
+   .
+   ----------------------------------------------------------------------
+   Ran 1 test in 0.004s
 
-	OK
+   OK
 
 API说明
 -------
@@ -129,22 +128,15 @@ Trouble Shoot
 原来，请求会在unix domain socket上排队。要承受高并发，必须修改这个排队的限制数。
 
 另外，某些CPU bound的服务，比如算路，应用以上修改后，依然有问题。
-采用以下方法可以解决：
+采用以下方法可以解决:
 
-   `sysctl -A`，检查net.core.somaxconn、net.core.netdev_max_backlog和net.ipv4.tcp_max_syn_backlog。
-   
-   vim /etc/sysctl.conf可以修改这几个参数。`sysctl -p`应用。
+1. `sysctl -A`，检查net.core.somaxconn、net.core.netdev_max_backlog和net.ipv4.tcp_max_syn_backlog。
+2. vim /etc/sysctl.conf可以修改这几个参数。`sysctl -p`应用。
 
 如果问题还没解决，可以试试：（按理说应该不需要改这个）
 
-   ulimit -a，查看open files
-
-   修改 /etc/security/limits.conf，加入:
+1. ulimit -a，查看open files
+2. 修改 /etc/security/limits.conf，加入:
 
    * soft nofile 1000000
    * hard nofile 1000000
-
-联系
-----
-
-如果发现任何bug，请联系 陈博伟 <mailto://chenbw@mapbar.com>`_ 。
