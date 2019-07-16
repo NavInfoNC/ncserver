@@ -39,6 +39,7 @@ protected:
 int main(int argc, char* argv[])
 {
 	EchoServer server;
-	server.runAndFork(9009);
+	server.runAndFork(9009);	// 9009 is only used on Windows. 
+								// When running under Linux, Unix Domain Socket is used instead.
 	return 0;
 }

@@ -58,7 +58,7 @@ This example program (in folder "example") shows the basic function of ncserver.
       return 0;
    }
 
-Run the program::
+Test the program::
 
    $ curl -I "http://127.0.0.1/echo?city=beijing&keyword=coffee"
    HTTP/1.1 200 OK
