@@ -49,6 +49,12 @@
     <ClInclude Include="..\include\ncserver.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\log.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\log_util.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\fcgi_bind.cpp">
@@ -82,6 +88,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\static_string_map.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\log_util.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
