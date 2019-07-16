@@ -6,6 +6,98 @@ ncserver是基于FastCGI和Nginx的一个C++在线服务开发框架。
 
 .. image:: docs/architecture.png
 
+A Simple Example
+----------------
+
+This example program (in folder "example") shows the basic function of ncserver.
+
+.. code-block:: cpp
+
+   // An example program of ncserver
+   #include <stdlib.h>
+   #include "ncserver.h"
+
+   using namespace std;
+   using namespace ncserver;
+
+   class EchoServer : public NcServer
+   {
+   protected:
+      virtual void query(ServiceIo* io, Request *request)
+      {
+         io->addHeaderField("Content-Type: text/plain; charset=utf-8");
+         io->endHeaderField();
+
+         // output request parameters
+         io->print("Request-Method: %s\n", request->requestMethod());
+
+         // parse and output query string
+         io->print("Query String: %s\n", request->queryString());
+         RequestParameteterIterator* iter = request->getParameterIterator();
+         while (iter->next())
+         {
+            io->print("%s: %s\n", iter->name, iter->value);
+         }
+
+         // read POST data
+         if (request->isPost())
+         {
+            unsigned char *buffer = new unsigned char[request->contentLength()];
+
+            io->read(buffer, request->contentLength());
+            io->write(buffer, request->contentLength());
+         }
+         io->flush();
+      }
+   };
+
+   int main(int argc, char* argv[])
+   {
+      EchoServer server;
+      server.runAndFork(9009);
+      return 0;
+   }
+
+Run the program::
+
+   $ curl -I "http://127.0.0.1/echo?city=beijing&keyword=coffee"
+   HTTP/1.1 200 OK
+   Server: nginx/1.7.2
+   Date: Tue, 16 Jul 2019 04:07:09 GMT
+   Content-Type: text/plain; charset=utf-8
+   Connection: keep-alive
+
+   $ curl  "http://127.0.0.1/echo?city=beijing&keyword=coffee"
+   Request-Method: GET
+   Query String: city=beijing&keyword=coffee
+   city: beijing
+   keyword: coffee
+
+Features
+--------
+
+In addition to having a low learning curve, ncserver also provide the following benefits:
+
+1. Multi-process architecture
+   
+   With multi-process architecture. Each process is isolated. 
+   Even if one process crashed, the following requests will not be affected.
+
+   With the help of the COW(copy-on-write) feature of Linux system, all work processes
+   can share static memory data. So more workers don't necessarily means more memory consumption.
+
+2. Automatically respawn of worker processes
+   
+   A daemon process will keep watching on all worker processes.
+   If one worker process crashed, a new worker process will be spawned.
+
+3. No-down-time reload
+   
+   If the configuration file or data file changes, the service can be reloaded with no down-time.
+
+What's Included
+---------------
+
 本项目包括：
 
 1. 源代码。可以编译为静态库使用。也可以直接加入工程使用。

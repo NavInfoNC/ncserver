@@ -1,6 +1,4 @@
-// echo.cpp : Defines the entry point for the console application.
-//
-
+// An example program of ncserver
 #include <stdlib.h>
 #include "ncserver.h"
 
@@ -12,22 +10,21 @@ class EchoServer : public NcServer
 protected:
 	virtual void query(ServiceIo* io, Request *request)
 	{
-		io->addHeaderField("Content-Type: text/html; charset=utf-8");
+		io->addHeaderField("Content-Type: text/plain; charset=utf-8");
 		io->endHeaderField();
 
-		io->print("= Request Header = <br>"
-			"Content-Type: %s <br>"
-			"Request-Method: %s <br>",
-			request->contentType(),
-			request->requestMethod());
+		// output request parameters
+		io->print("Request-Method: %s\n", request->requestMethod());
 
-		io->print("= Query String = %s<br>", request->queryString());
+		// parse and output query string
+		io->print("Query String: %s\n", request->queryString());
 		RequestParameteterIterator* iter = request->getParameterIterator();
 		while (iter->next())
 		{
-			io->print("%s: %s<br>", iter->name, iter->value);
+			io->print("%s: %s\n", iter->name, iter->value);
 		}
 
+		// read POST data
 		if (request->isPost())
 		{
 			unsigned char *buffer = new unsigned char[request->contentLength()];
