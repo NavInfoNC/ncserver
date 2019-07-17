@@ -1,6 +1,7 @@
 #!/usr/bin/python 
 
 import sys
+import argparse
 
 def generate_config(program_name):
     logFormat = R'$template logFormat, "[%timegenerated%] [%hostname%] [{\"server\":\"%syslogtag:R:[A-Za-z]\+\[[0-9]\+\]--end%\",\"level\":\"%syslogseverity-text%\",\"log\":\"[%rawmsg%]\"}]\n"'
@@ -13,15 +14,14 @@ def generate_config(program_name):
     fileHandler.write(filter + '\n')
     fileHandler.close()
 
-def print_help():
-    print("./generate_config.py $server_name")
-
 def main():
-    if len(sys.argv) != 2:
-        print("parameter error")
-        print_help()
-        return -1
-    generate_config(sys.argv[1]);
+    parser = argparse.ArgumentParser(usage="./generate_config.py $SERVER_NAME")
+    parser.add_argument("SERVER_NAME", help="assign the server name")
+    try:
+        args = parser.parse_args()
+    except:
+        sys.exit(1)
+    generate_config(args.SERVER_NAME);
     return 0
 
 if __name__ == "__main__":

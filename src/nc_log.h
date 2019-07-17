@@ -9,10 +9,10 @@ namespace ncserver {
 
 		/**
 			@note 
-			This function need to be called before used the marco ASYNC_LOG_*.
-			Usually, it is called when the program is initialized.
+				This function need to be called before used the marco ASYNC_LOG_*.
+				Usually, it is called when the program is initialized.
 			@example
-			Logger::instance().init(@serverName, @logLevel);
+				Logger::instance().init(@serverName, @logLevel);
 		*/
 		void init(const char* serverName, int priority);
 
@@ -89,7 +89,7 @@ namespace ncserver {
 
 #define ASYNC_LOG_WARNING(fmt, ...) do { \
 	ncserver::Logger::instance().log(4, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
-}while (0)
+	}while (0)
 
 #define ASYNC_LOG_ERR(fmt, ...) do { \
 	ncserver::Logger::instance().log(3, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
