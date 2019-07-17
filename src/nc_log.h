@@ -27,7 +27,10 @@ namespace ncserver {
 	private:
 		Logger();
 		~Logger();
-#ifdef linux
+
+		const char* logLevelToString(int logLevel);
+
+#ifndef WIN32
 		void write(int priority, const char *format, ...);
 #endif
 		int m_priority;
@@ -35,7 +38,7 @@ namespace ncserver {
 		int m_bufferSize;
 	};
 
-#ifdef linux
+#ifndef WIN32
 	void _updateLogLevel(int sig);
 
 	/**

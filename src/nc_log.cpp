@@ -3,14 +3,12 @@
 #include <cstdarg>
 #include "nc_log.h"
 
-#ifdef WIN32
-#include "windows.h"
-#endif
-
-#ifdef linux
+#ifndef WIN32
 #include <signal.h>
 #include <syslog.h>
 #include "alloca.h"
+#else
+#include "windows.h"
 #endif
 
 namespace ncserver
@@ -28,7 +26,7 @@ namespace ncserver
 
 	Logger::~Logger()
 	{
-#ifdef linux
+#ifndef WIN32
 		::closelog();
 #endif
 	}
@@ -36,7 +34,7 @@ namespace ncserver
 	void Logger::init(const char* serverName, int priority)
 	{
 		m_priority = priority;
-#ifdef linux
+#ifndef WIN32
 		::openlog(serverName, LOG_CONS | LOG_PID, LOG_DEBUG);
 #endif
 	}
@@ -47,24 +45,49 @@ namespace ncserver
 		va_list args;
 		va_start(args, format);
 		
-#ifdef linux
+#ifndef WIN32
 		vsnprintf(m_message, m_bufferSize, format, args);
 #else
 		vsnprintf_s(m_message, m_bufferSize, m_bufferSize-1, format, args);
 #endif
 		va_end(args);
 
-#ifdef linux
+#ifndef WIN32
 		write(priority, "{\"file\":\"%s\",\"line\":%d,\"func\":\"%s\",\"msg\":\"%s\"}\0", file, line, func, m_message);
 #else
-		printf("\"level\":%d,\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", priority, file, line, func, m_message);
+		printf("\"level\":\"%s\",\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", logLevelToString(priority), file, line, func, m_message);
 		char debugMessage[8092];
-		_snprintf_s(debugMessage, 8092, "\"level\":%d,\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", priority, file, line, func, m_message);
+		_snprintf_s(debugMessage, 8092, "\"level\":\"%s\",\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", logLevelToString(priority), file, line, func, m_message);
 		OutputDebugStringA(debugMessage);
 #endif
 	}
 
-#ifdef linux
+	const char* Logger::logLevelToString(int logLevel)
+	{
+		switch(logLevel)
+		{
+		case 0:
+			return "emerg";
+		case 1:
+			return "alert";
+		case 2:
+			return "crit";
+		case 3:
+			return "error";
+		case 4:
+			return "warning";
+		case 5:
+			return "notice";
+		case 6:
+			return "info";
+		case 7:
+			return "debug";
+		default:
+				return NULL;
+		}
+	}
+
+#ifndef WIN32
 
 	void Logger::write(int priority, const char *format, ...) {
 		va_list args;
