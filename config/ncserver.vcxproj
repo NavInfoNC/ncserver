@@ -109,8 +109,7 @@
     <ClInclude Include="..\include\ncserver.h" />
     <ClInclude Include="..\src\fcgi_bind.h" />
     <ClInclude Include="..\src\fcgi_service_io.h" />
-    <ClInclude Include="..\src\log.h" />
-    <ClInclude Include="..\src\log_util.h" />
+    <ClInclude Include="..\src\nc_log.h" />
     <ClInclude Include="..\src\stdafx.h" />
     <ClInclude Include="..\src\util.h" />
   </ItemGroup>
@@ -149,8 +148,8 @@
     </ClCompile>
     <ClCompile Include="..\src\fcgi_bind.cpp" />
     <ClCompile Include="..\src\fcgi_service_io.cpp" />
-    <ClCompile Include="..\src\log_util.cpp" />
     <ClCompile Include="..\src\ncserver.cpp" />
+    <ClCompile Include="..\src\nc_log.cpp" />
     <ClCompile Include="..\src\static_string_map.cpp" />
     <ClCompile Include="..\src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

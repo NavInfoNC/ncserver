@@ -58,6 +58,9 @@
     <ClInclude Include="..\gtest\gtest.h">
       <Filter>gtest</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\nc_log.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\fcgi_bind.cpp">
@@ -101,6 +104,12 @@
     </ClCompile>
     <ClCompile Include="..\gtest\gtest-all.cc">
       <Filter>gtest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nc_log.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\async_log_unitest.cpp">
+      <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
