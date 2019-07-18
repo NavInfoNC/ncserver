@@ -49,7 +49,7 @@
     <ClInclude Include="..\include\ncserver.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\nc_log.h">
+    <ClInclude Include="..\include\nc_log.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

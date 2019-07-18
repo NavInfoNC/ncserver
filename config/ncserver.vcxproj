@@ -107,9 +107,9 @@
     <ClInclude Include="..\fastcgi\include\fcgi_config_x86.h" />
     <ClInclude Include="..\fastcgi\include\fcgi_stdio.h" />
     <ClInclude Include="..\include\ncserver.h" />
+    <ClInclude Include="..\include\nc_log.h" />
     <ClInclude Include="..\src\fcgi_bind.h" />
     <ClInclude Include="..\src\fcgi_service_io.h" />
-    <ClInclude Include="..\src\nc_log.h" />
     <ClInclude Include="..\src\stdafx.h" />
     <ClInclude Include="..\src\util.h" />
   </ItemGroup>

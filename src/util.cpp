@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <string.h>
+#include <signal.h>
 #include "util.h"
 
 namespace ncserver
@@ -63,4 +64,22 @@ namespace ncserver
 
 		return i;
 	}
-}
+
+#ifndef WIN32
+	void(*signal(int signo, void(*handler)(int)))(int)
+	{
+
+		struct sigaction act, oact;
+		act.sa_handler = handler;
+		sigemptyset(&act.sa_mask);
+		act.sa_flags = 0;
+#ifdef SA_INTERRUPT
+		act.sa_flags |= SA_INTERRUPT;
+#endif
+		if (sigaction(signo, &act, &oact) < 0)
+			return SIG_ERR;
+		return oact.sa_handler;
+	}
+#endif
+
+} //namespace ncserver

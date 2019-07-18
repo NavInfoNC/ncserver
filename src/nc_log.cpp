@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <cstdarg>
 #include "nc_log.h"
+#include "util.h"
 
 #ifndef WIN32
 #include <signal.h>
-#include <syslog.h>
 #include "alloca.h"
 #else
 #include "windows.h"
@@ -22,6 +22,7 @@ namespace ncserver
 	Logger::Logger()
 	{
 		m_bufferSize = 4096;
+		m_logLevel = LogLevel_error;
 	}
 
 	Logger::~Logger()
@@ -31,33 +32,33 @@ namespace ncserver
 #endif
 	}
 
-	void Logger::init(const char* serverName, int priority)
+	void Logger::init(const char* serverName, int logLevel)
 	{
-		m_priority = priority;
+		m_logLevel = logLevel;
 #ifndef WIN32
 		::openlog(serverName, LOG_CONS | LOG_PID, LOG_DEBUG);
 #endif
 	}
 
-	void Logger::log(int priority, const char* file, int line, const char* func, const char *format, ...) {
-		if (priority > m_priority) return;
-		m_message = (char*)alloca(sizeof(char) * m_bufferSize);
+	void Logger::log(int logLevel, const char* file, int line, const char* func, const char *format, ...) {
+		if (logLevel > m_logLevel) return;
+		char * message = (char*)alloca(sizeof(char) * m_bufferSize);
 		va_list args;
 		va_start(args, format);
 		
 #ifndef WIN32
-		vsnprintf(m_message, m_bufferSize, format, args);
+		vsnprintf(message, m_bufferSize, format, args);
 #else
-		vsnprintf_s(m_message, m_bufferSize, m_bufferSize-1, format, args);
+		vsnprintf_s(message, m_bufferSize, m_bufferSize-1, format, args);
 #endif
 		va_end(args);
 
 #ifndef WIN32
-		write(priority, "{\"file\":\"%s\",\"line\":%d,\"func\":\"%s\",\"msg\":\"%s\"}\0", file, line, func, m_message);
+		write(logLevel, "{\"file\":\"%s\",\"line\":%d,\"func\":\"%s\",\"msg\":\"%s\"}\0", file, line, func, message);
 #else
-		printf("\"level\":\"%s\",\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", logLevelToString(priority), file, line, func, m_message);
-		char debugMessage[8092];
-		_snprintf_s(debugMessage, 8092, "\"level\":\"%s\",\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", logLevelToString(priority), file, line, func, m_message);
+		printf("\"level\":\"%s\",\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", logLevelToString(logLevel), file, line, func, message);
+		char* debugMessage = (char*)alloca(sizeof(char)* (m_bufferSize + 128));
+		_snprintf_s(debugMessage, m_bufferSize + 128, m_bufferSize + 127, "\"level\":\"%s\",\"file\":\"%s\",\"line\":\"%d\",\"func\":\"%s\",\"msg\":\"%s\"\n", logLevelToString(logLevel), file, line, func, message);
 		OutputDebugStringA(debugMessage);
 #endif
 	}
@@ -83,57 +84,58 @@ namespace ncserver
 		case 7:
 			return "debug";
 		default:
-				return NULL;
+			return NULL;
 		}
 	}
 
 #ifndef WIN32
-
 	void Logger::write(int priority, const char *format, ...) {
 		va_list args;
 		va_start(args, format);
 		vsyslog(priority, format, args);
 		va_end(args);
 	}
-
-	void _updateLogLevel(int sig)
+	
+    static void _updateLogLevel(int sig)
 	{
 		if (sig == SIGRTMIN + 1)
 		{
-			Logger::instance().setPriority(LOG_DEBUG);
+			Logger::instance().setLogLevel(LOG_DEBUG);
 		}
 		else if (sig == SIGRTMIN + 2)
 		{
-			Logger::instance().setPriority(LOG_INFO);
+			Logger::instance().setLogLevel(LOG_INFO);
 		}
 		else if (sig == SIGRTMIN + 3)
 		{
-			Logger::instance().setPriority(LOG_NOTICE);
+			Logger::instance().setLogLevel(LOG_NOTICE);
 		}
 		else if (sig == SIGRTMIN + 4)
 		{
-			Logger::instance().setPriority(LOG_WARNING);
+			Logger::instance().setLogLevel(LOG_WARNING);
 		}
 		else if (sig == SIGRTMIN + 5)
 		{
-			Logger::instance().setPriority(LOG_ERR);
+			Logger::instance().setLogLevel(LOG_ERR);
 		}
 		else if (sig == SIGRTMIN + 6)
 		{
-			Logger::instance().setPriority(LOG_CRIT);
+			Logger::instance().setLogLevel(LOG_CRIT);
 		}
 		else if (sig == SIGRTMIN + 7)
 		{
-			Logger::instance().setPriority(LOG_ALERT);
+			Logger::instance().setLogLevel(LOG_ALERT);
 		}
 		else if (sig == SIGRTMIN + 8)
 		{
-			Logger::instance().setPriority(LOG_EMERG);
+			Logger::instance().setLogLevel(LOG_EMERG);
 		}
 	}
+#endif
 
-	void _registerUpdateLogLevelSignal()
+	void Logger::registerUpdateLogLevelSignal()
 	{
+#ifndef WIN32
 		signal(SIGRTMIN + 1, _updateLogLevel);
 		signal(SIGRTMIN + 2, _updateLogLevel);
 		signal(SIGRTMIN + 3, _updateLogLevel);
@@ -142,7 +144,7 @@ namespace ncserver
 		signal(SIGRTMIN + 6, _updateLogLevel);
 		signal(SIGRTMIN + 7, _updateLogLevel);
 		signal(SIGRTMIN + 8, _updateLogLevel);
+#endif
 	}
 
-#endif
 }

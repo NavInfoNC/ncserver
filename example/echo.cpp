@@ -1,6 +1,7 @@
 // An example program of ncserver
 #include <stdlib.h>
 #include "ncserver.h"
+#include "nc_log.h"
 
 using namespace std;
 using namespace ncserver;
@@ -15,13 +16,16 @@ protected:
 
 		// output request parameters
 		io->print("Request-Method: %s\n", request->requestMethod());
+		ASYNC_LOG_INFO("Request-Method: %s", request->requestMethod());
 
 		// parse and output query string
 		io->print("Query String: %s\n", request->queryString());
+		ASYNC_LOG_INFO("Query String: %s", request->queryString());
 		RequestParameteterIterator* iter = request->getParameterIterator();
 		while (iter->next())
 		{
 			io->print("%s: %s\n", iter->name, iter->value);
+			ASYNC_LOG_INFO("%s: %s", iter->name, iter->value);
 		}
 
 		// read POST data
@@ -38,6 +42,8 @@ protected:
 
 int main(int argc, char* argv[])
 {
+	Logger::instance().registerUpdateLogLevelSignal();
+	Logger::instance().init("echo", LogLevel_info);
 	EchoServer server;
 	server.runAndFork(9009);	// 9009 is only used on Windows. 
 								// When running under Linux, Unix Domain Socket is used instead.

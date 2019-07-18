@@ -15,7 +15,7 @@ def generate_config(program_name):
     fileHandler.close()
 
 def main():
-    parser = argparse.ArgumentParser(usage="./generate_config.py $SERVER_NAME")
+    parser = argparse.ArgumentParser(usage="./generate_config.py $SERVER_NAME", description="Generte rsyslog.d config file (/etc/rsyslog.d/SERVER_NAME.conf) by server name")
     parser.add_argument("SERVER_NAME", help="assign the server name")
     try:
         args = parser.parse_args()
