@@ -98,10 +98,6 @@ namespace ncserver
 		int logLevel() { return m_logLevel; }
 		void setLogLevel(int logLevel) { m_logLevel = logLevel; }
 
-		// default = 4096
-		int bufferSize() { return m_bufferSize; }
-		void setBufferSize(int bufferSize) { m_bufferSize = bufferSize; }
-
 	private:
 		NcLog();
 		~NcLog();
@@ -111,7 +107,6 @@ namespace ncserver
 		void write(int priority, const char *format, ...);
 
 		int m_logLevel;
-		int m_bufferSize;
 	};
 
 } // namespace ncserver
