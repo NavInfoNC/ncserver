@@ -15,13 +15,13 @@ def generate_config(program_name):
     fileHandler.close()
 
 def main():
-    parser = argparse.ArgumentParser(usage="./generate_config.py $SERVER_NAME", description="Generte rsyslog.d config file by server name")
-    parser.add_argument("SERVER_NAME", help="assign the server name", type=str)
+    parser = argparse.ArgumentParser(description="Generte rsyslog.d config file (/etc/rsyslog.d/SERVER_NAME.conf) by server name")
+    parser.add_argument("server_name", metavar='SERVER_NAME', help="assign the server name")
     try:
         args = parser.parse_args()
     except:
         sys.exit(1)
-    generate_config(args.SERVER_NAME);
+    generate_config(args.server_name);
     return 0
 
 if __name__ == "__main__":
