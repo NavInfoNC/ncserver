@@ -85,14 +85,14 @@ namespace ncserver
 				message = (char*)alloca(bufferSize + headerSize);
 				memcpy(message, header, headerSize);
 				int requiredSize = vsnprintf(message + headerSize, bufferSize, format, args);
-				if (requiredSize < 0)
+				if (requiredSize < 0 || requiredSize >= 64 * 1024)
 				{
 					failed = true;
 					break;	// error
 				}
 				else if (requiredSize < bufferSize)
 					break;	// done
-				else
+				else 
 				{
 					// buffer insufficient
 					bufferSize = 64 * 1024;
