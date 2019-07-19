@@ -61,12 +61,14 @@ TEST_F(NcLogTest, basic)
 
 TEST_F(NcLogTest, 10k)
 {
-	// 8k*'a' = 'aaaaaaaaaaaaaaaaaaaaaaaa....'
-	char largeBuffer8k[1024 * 10];
-	memset(largeBuffer8k, 'a', sizeof(largeBuffer8k));
-	largeBuffer8k[sizeof(largeBuffer8k) - 1] = 0;
-	ASYNC_LOG_ALERT(largeBuffer8k);
-	EXPECT_EQ(strlen(lastMessage()), strlen(largeBuffer8k));
+	// 10k*'a' = 'aaaaaaaaaaaaaaaaaaaaaaaa....'
+	char largeBuffer[1024 * 10];
+	memset(largeBuffer, 'a', sizeof(largeBuffer));
+	largeBuffer[sizeof(largeBuffer) - 1] = 0;
+	ASYNC_LOG_ALERT(largeBuffer);
+	EXPECT_TRUE(lastMessage()[0] == 'a');
+	EXPECT_TRUE(lastMessage()[sizeof(largeBuffer) - 2] == 'a');
+	EXPECT_EQ(strlen(lastMessage()), strlen(largeBuffer));
 }
 
 TEST_F(NcLogTest, 65k)
