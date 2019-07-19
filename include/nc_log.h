@@ -121,33 +121,33 @@ namespace ncserver
 } // namespace ncserver
 
 #define ASYNC_LOG_DEBUG(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_debug, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_debug, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
 
 #define ASYNC_LOG_INFO(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_info, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_info, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
 
 #define ASYNC_LOG_NOTICE(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_notice, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_notice, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
 
 #define ASYNC_LOG_WARNING(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_warning, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_warning, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
 
 #define ASYNC_LOG_ERR(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_error, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_error, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
 
 #define ASYNC_LOG_CRIT(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_crit, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_crit, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
 
 #define ASYNC_LOG_ALERT(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_alert, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_alert, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
 
 #define ASYNC_LOG_EMERG(fmt, ...) do { \
-	ncserver::NcLog::instance().log(ncserver::LogLevel_emerg, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__); \
+	ncserver::NcLog::instance().log(ncserver::LogLevel_emerg, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)
