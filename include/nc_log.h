@@ -58,6 +58,12 @@ namespace ncserver
 
 	const char* LogLevel_toString(LogLevel o);
 
+	class NcLogDelegate
+	{
+	public:
+		virtual void nclogWillOutputMessage(const char* message) = 0;
+	};
+
 	class NcLog
 	{
 	public:
@@ -100,6 +106,8 @@ namespace ncserver
 		int logLevel() { return m_logLevel; }
 		void setLogLevel(int logLevel) { m_logLevel = logLevel; }
 
+		void setDelegate(NcLogDelegate* d) { m_delegate = d; }
+
 	private:
 		NcLog();
 		~NcLog();
@@ -107,6 +115,7 @@ namespace ncserver
 		void write(int priority, const char *format, ...);
 
 		int m_logLevel;
+		NcLogDelegate* m_delegate;
 	};
 
 } // namespace ncserver

@@ -48,6 +48,7 @@ namespace ncserver
 	NcLog::NcLog()
 	{
 		m_logLevel = LogLevel_error;
+		m_delegate = NULL;
 	}
 
 	NcLog::~NcLog()
@@ -67,10 +68,12 @@ namespace ncserver
 
 	void NcLog::log(LogLevel logLevel, const char* file, int line, const char* func, const char* format, ...)
 	{
+		const static int MAX_MESSAGE_SIZE = 64 * 1024;
+
 		if (logLevel > m_logLevel) 
 			return;
 
-		char header[4096];
+		char header[2048];
 		sprintf(header, R"(%s(%d): %s: [%s] )", file, line, LogLevel_toString(logLevel), func);
 		size_t headerSize = strlen(header);
 
@@ -79,12 +82,22 @@ namespace ncserver
 		va_list args;
 		va_start(args, format);
 		{
-			int bufferSize = 4096 * 2;
+			int bufferSize = 4096;
 			for (;;)
 			{
 				message = (char*)alloca(bufferSize + headerSize);
 				memcpy(message, header, headerSize);
-				int requiredSize = vsnprintf(message + headerSize, bufferSize, format, args);
+
+				int requiredSize;
+#if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
+				requiredSize = _vscprintf(format, args) + 1;
+				if (requiredSize <= bufferSize)
+				{
+					vsnprintf(message + headerSize, bufferSize, format, args);
+				}
+#else
+				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args);
+#endif
 				if (requiredSize < 0)
 				{
 					failed = true;
@@ -92,10 +105,15 @@ namespace ncserver
 				}
 				else if (requiredSize < bufferSize)
 					break;	// done
-				else
+				else if (requiredSize <= MAX_MESSAGE_SIZE)
 				{
 					// buffer insufficient
-					bufferSize = 64 * 1024;
+					bufferSize = MAX_MESSAGE_SIZE;
+				}
+				else
+				{
+					failed = true;
+					break;
 				}
 			}
 		}
@@ -104,12 +122,17 @@ namespace ncserver
 		if (failed)
 			return;
 
+		if (m_delegate != NULL)
+			m_delegate->nclogWillOutputMessage(message);
+		else
+		{
 #if defined(WIN32)
-		printf(message);
-		OutputDebugStringA(message);
+			printf(message);
+			OutputDebugStringA(message);
 #else
-		write(logLevel, message);
+			write(logLevel, message);
 #endif
+		}
 	}
 
 #if !defined(WIN32)
