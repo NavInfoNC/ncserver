@@ -79,7 +79,6 @@ namespace ncserver
 
 		char* message = NULL;
 		bool failed = false;
-
 		int bufferSize = 4096;
 		for (;;)
 		{
@@ -87,26 +86,21 @@ namespace ncserver
 			memcpy(message, header, headerSize);
 
 			int requiredSize;
-#if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
 			va_list args;
 			va_start(args, format);
 			{
+#if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
 				requiredSize = _vscprintf(format, args) + 1;
 				if (requiredSize <= bufferSize)
 				{
 					vsnprintf(message + headerSize, bufferSize, format, args);
-				}			
-			}
-			va_end(args);
+				}
 #else
-	
-			va_list args;
-			va_start(args, format);
-			{
 				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
+#endif
 			}
 			va_end(args);
-#endif
+
 			if (requiredSize < 0)
 			{
 				failed = true;
@@ -125,7 +119,6 @@ namespace ncserver
 				break;
 			}
 		}
-
 
 		if (failed)
 			return;
