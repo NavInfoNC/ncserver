@@ -48,6 +48,7 @@ namespace ncserver
 	NcLog::NcLog()
 	{
 		m_logLevel = LogLevel_error;
+		m_delegate = NULL;
 	}
 
 	NcLog::~NcLog()
@@ -104,12 +105,17 @@ namespace ncserver
 		if (failed)
 			return;
 
+		if (m_delegate != NULL)
+			m_delegate->nclogWillOutputMessage(message);
+		else
+		{
 #if defined(WIN32)
-		printf(message);
-		OutputDebugStringA(message);
+			printf(message);
+			OutputDebugStringA(message);
 #else
-		write(logLevel, message);
+			write(logLevel, message);
 #endif
+		}
 	}
 
 #if !defined(WIN32)
