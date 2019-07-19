@@ -13,6 +13,32 @@
 
 namespace ncserver
 {
+	const char* LogLevel_toString(LogLevel o)
+	{
+		switch (o)
+		{
+		case 0:
+			return "emerg";
+		case 1:
+			return "alert";
+		case 2:
+			return "crit";
+		case 3:
+			return "error";
+		case 4:
+			return "warning";
+		case 5:
+			return "notice";
+		case 6:
+			return "info";
+		case 7:
+			return "debug";
+		default:
+			return "none";
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	NcLog& NcLog::instance()
 	{
 		static NcLog logger;
@@ -39,13 +65,13 @@ namespace ncserver
 #endif
 	}
 
-	void NcLog::log(int logLevel, const char* file, int line, const char* func, const char* format, ...) 
+	void NcLog::log(LogLevel logLevel, const char* file, int line, const char* func, const char* format, ...)
 	{
 		if (logLevel > m_logLevel) 
 			return;
 
 		char header[4096];
-		sprintf(header, R"(%s(%d): %s: [%s] )", file, line, logLevelToString(logLevel), func);
+		sprintf(header, R"(%s(%d): %s: [%s] )", file, line, LogLevel_toString(logLevel), func);
 		size_t headerSize = strlen(header);
 
 		char* message = NULL;
@@ -82,33 +108,8 @@ namespace ncserver
 		printf(message);
 		OutputDebugStringA(message);
 #else
-		write(logLevel, "{\"file\":\"%s\",\"line\":%d,\"func\":\"%s\",\"msg\":\"%s\"}\0", file, line, func, message);
+		write(logLevel, message);
 #endif
-	}
-
-	const char* NcLog::logLevelToString(int logLevel)
-	{
-		switch(logLevel)
-		{
-		case 0:
-			return "emerg";
-		case 1:
-			return "alert";
-		case 2:
-			return "crit";
-		case 3:
-			return "error";
-		case 4:
-			return "warning";
-		case 5:
-			return "notice";
-		case 6:
-			return "info";
-		case 7:
-			return "debug";
-		default:
-			return NULL;
-		}
 	}
 
 #if !defined(WIN32)

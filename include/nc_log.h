@@ -27,35 +27,37 @@ SOFTWARE.
 #include <syslog.h>
 #endif
 
-#if defined(WIN32)
-enum LogLevel
-{
-	LogLevel_debug = 7,
-	LogLevel_info = 6,
-	LogLevel_notice = 5,
-	LogLevel_warning = 4,
-	LogLevel_error = 3,
-	LogLevel_crit = 2,
-	LogLevel_alert = 1,
-	LogLevel_emerg = 0
-};
-#else
-enum LogLevel
-{
-	LogLevel_debug = LOG_DEBUG,
-	LogLevel_info = LOG_INFO,
-	LogLevel_notice = LOG_NOTICE,
-	LogLevel_warning = LOG_WARNING,
-	LogLevel_error = LOG_ERR,
-	LogLevel_crit = LOG_CRIT,
-	LogLevel_alert = LOG_ALERT,
-	LogLevel_emerg = LOG_EMERG
-};
-#endif 
-
-
 namespace ncserver 
 {
+
+#if defined(WIN32)
+	enum LogLevel
+	{
+		LogLevel_debug = 7,
+		LogLevel_info = 6,
+		LogLevel_notice = 5,
+		LogLevel_warning = 4,
+		LogLevel_error = 3,
+		LogLevel_crit = 2,
+		LogLevel_alert = 1,
+		LogLevel_emerg = 0
+	};
+#else
+	enum LogLevel
+	{
+		LogLevel_debug = LOG_DEBUG,
+		LogLevel_info = LOG_INFO,
+		LogLevel_notice = LOG_NOTICE,
+		LogLevel_warning = LOG_WARNING,
+		LogLevel_error = LOG_ERR,
+		LogLevel_crit = LOG_CRIT,
+		LogLevel_alert = LOG_ALERT,
+		LogLevel_emerg = LOG_EMERG
+	};
+#endif 
+
+	const char* LogLevel_toString(LogLevel o);
+
 	class NcLog
 	{
 	public:
@@ -92,7 +94,7 @@ namespace ncserver
 		*/
 		void init(const char* serverName, int logLevel);
 
-		void log(int priority, const char* file, int line, const char* func, const char *format, ...);
+		void log(LogLevel level, const char* file, int line, const char* func, const char *format, ...);
 
 		// default = LogLevel_error
 		int logLevel() { return m_logLevel; }
@@ -101,8 +103,6 @@ namespace ncserver
 	private:
 		NcLog();
 		~NcLog();
-
-		const char* logLevelToString(int logLevel);
 
 		void write(int priority, const char *format, ...);
 
