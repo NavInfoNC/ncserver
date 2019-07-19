@@ -34,7 +34,6 @@ ELSEIF (${CMAKE_GENERATOR} STREQUAL "Unix Makefiles")
 	add_definitions(
 		-DNDEBUG
 		-DLINUX
-		-DMAPBAR_LINUX
 		-DAMD64
 		-g
 		-fshort-wchar

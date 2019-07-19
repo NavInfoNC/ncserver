@@ -1,0 +1,173 @@
+#include "stdafx.h"
+#include <stdio.h>
+#include <cstdarg>
+#include "nc_log.h"
+#include "util.h"
+
+#if defined(WIN32)
+#	include "windows.h"
+#else
+#	include <signal.h>
+#	include "alloca.h"
+#endif
+
+namespace ncserver
+{
+	NcLog& NcLog::instance()
+	{
+		static NcLog logger;
+		return logger;
+	}
+
+	NcLog::NcLog()
+	{
+		m_logLevel = LogLevel_error;
+	}
+
+	NcLog::~NcLog()
+	{
+#if !defined(WIN32)
+		::closelog();
+#endif
+	}
+
+	void NcLog::init(const char* serverName, int logLevel)
+	{
+		m_logLevel = logLevel;
+#if !defined(WIN32)
+		::openlog(serverName, LOG_CONS | LOG_PID, LOG_DEBUG);
+#endif
+	}
+
+	void NcLog::log(int logLevel, const char* file, int line, const char* func, const char* format, ...) 
+	{
+		if (logLevel > m_logLevel) 
+			return;
+
+		char header[4096];
+		sprintf(header, R"(%s(%d): %s: [%s] )", file, line, logLevelToString(logLevel), func);
+		size_t headerSize = strlen(header);
+
+		char* message = NULL;
+		bool failed = false;
+		va_list args;
+		va_start(args, format);
+		{
+			int bufferSize = 4096 * 2;
+			for (;;)
+			{
+				message = (char*)alloca(bufferSize + headerSize);
+				memcpy(message, header, headerSize);
+				int requiredSize = vsnprintf(message + headerSize, bufferSize, format, args);
+				if (requiredSize < 0)
+				{
+					failed = true;
+					break;	// error
+				}
+				else if (requiredSize < bufferSize)
+					break;	// done
+				else
+				{
+					// buffer insufficient
+					bufferSize = 64 * 1024;
+				}
+			}
+		}
+		va_end(args);
+
+		if (failed)
+			return;
+
+#if defined(WIN32)
+		printf(message);
+		OutputDebugStringA(message);
+#else
+		write(logLevel, "{\"file\":\"%s\",\"line\":%d,\"func\":\"%s\",\"msg\":\"%s\"}\0", file, line, func, message);
+#endif
+	}
+
+	const char* NcLog::logLevelToString(int logLevel)
+	{
+		switch(logLevel)
+		{
+		case 0:
+			return "emerg";
+		case 1:
+			return "alert";
+		case 2:
+			return "crit";
+		case 3:
+			return "error";
+		case 4:
+			return "warning";
+		case 5:
+			return "notice";
+		case 6:
+			return "info";
+		case 7:
+			return "debug";
+		default:
+			return NULL;
+		}
+	}
+
+#if !defined(WIN32)
+	void NcLog::write(int priority, const char *format, ...) {
+		va_list args;
+		va_start(args, format);
+		vsyslog(priority, format, args);
+		va_end(args);
+	}
+	
+    static void _updateLogLevel(int sig)
+	{
+		if (sig == SIGRTMIN + 1)
+		{
+			NcLog::instance().setLogLevel(LOG_DEBUG);
+		}
+		else if (sig == SIGRTMIN + 2)
+		{
+			NcLog::instance().setLogLevel(LOG_INFO);
+		}
+		else if (sig == SIGRTMIN + 3)
+		{
+			NcLog::instance().setLogLevel(LOG_NOTICE);
+		}
+		else if (sig == SIGRTMIN + 4)
+		{
+			NcLog::instance().setLogLevel(LOG_WARNING);
+		}
+		else if (sig == SIGRTMIN + 5)
+		{
+			NcLog::instance().setLogLevel(LOG_ERR);
+		}
+		else if (sig == SIGRTMIN + 6)
+		{
+			NcLog::instance().setLogLevel(LOG_CRIT);
+		}
+		else if (sig == SIGRTMIN + 7)
+		{
+			NcLog::instance().setLogLevel(LOG_ALERT);
+		}
+		else if (sig == SIGRTMIN + 8)
+		{
+			NcLog::instance().setLogLevel(LOG_EMERG);
+		}
+	}
+#endif
+
+	void NcLog::registerUpdateLogLevelSignal()
+	{
+#if !defined(WIN32)
+		signal(SIGRTMIN + 1, _updateLogLevel);
+		signal(SIGRTMIN + 2, _updateLogLevel);
+		signal(SIGRTMIN + 3, _updateLogLevel);
+		signal(SIGRTMIN + 4, _updateLogLevel);
+		signal(SIGRTMIN + 5, _updateLogLevel);
+		signal(SIGRTMIN + 6, _updateLogLevel);
+		signal(SIGRTMIN + 7, _updateLogLevel);
+		signal(SIGRTMIN + 8, _updateLogLevel);
+#endif
+	}
+
+}

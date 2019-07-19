@@ -28,7 +28,7 @@ SOFTWARE.
 #include "fcgi_service_io.h"
 #include "util.h"
 
-#ifdef MAPBAR_LINUX
+#ifndef WIN32
 #include <sys/wait.h>
 #include <sys/mman.h>
 #include <thread>
@@ -37,23 +37,6 @@ SOFTWARE.
 
 bool g_ncServerExit = false;
 bool g_ncServerReload = false;
-
-#ifdef MAPBAR_LINUX
-
-void (*signal(int signo, void (*handler)(int)))(int)
-{
-	struct sigaction act, oact;
-	act.sa_handler = handler;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
-#ifdef SA_INTERRUPT
-	act.sa_flags |= SA_INTERRUPT;
-#endif
-	if (sigaction(signo, &act, &oact) < 0)
-		return SIG_ERR;
-	return oact.sa_handler;
-}
-#endif
 
 namespace ncserver
 {
@@ -172,7 +155,7 @@ namespace ncserver
 
 	NcServer::~NcServer()
 	{
-#ifdef MAPBAR_LINUX
+#ifndef WIN32
 		delete[] m_children;
 		m_children = NULL;
 		delete[] m_childrenStates;
@@ -196,7 +179,7 @@ namespace ncserver
 		signal(SIGINT, handleExitSignalForNonWorker);
 		signal(SIGTERM, handleExitSignalForNonWorker);
 
-#ifdef MAPBAR_LINUX
+#ifndef WIN32
 
 		void* sharedMemory = NULL;
 		if ((sharedMemory = mmap(0, sizeof(bool), PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0)) == MAP_FAILED)
@@ -277,7 +260,7 @@ namespace ncserver
 
 		fcgi_init(port);
 
-#ifdef MAPBAR_LINUX
+#ifndef WIN32
 		if (forkChildren())
 		{
 			identity = Identity::Manager;
@@ -316,7 +299,7 @@ namespace ncserver
 			}
 		}
 
-#ifdef MAPBAR_LINUX
+#ifndef WIN32
 		if(identity == Identity::Manager)
 #endif
 		{
@@ -379,7 +362,7 @@ namespace ncserver
 
 	void NcServer::reforkAllChildren()
 	{
-#ifdef MAPBAR_LINUX
+#ifndef WIN32
 		if (m_children == NULL)
 			return;
 
@@ -392,7 +375,7 @@ namespace ncserver
 #endif
 	}
 
-#ifdef MAPBAR_LINUX
+#ifndef WIN32
 	NcServer::NcServer()
 	{
 		const char* childCountStr = getenv("childCount");
