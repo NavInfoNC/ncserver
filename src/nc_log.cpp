@@ -79,45 +79,53 @@ namespace ncserver
 
 		char* message = NULL;
 		bool failed = false;
-		va_list args;
-		va_start(args, format);
-		{
-			int bufferSize = 4096;
-			for (;;)
-			{
-				message = (char*)alloca(bufferSize + headerSize);
-				memcpy(message, header, headerSize);
 
-				int requiredSize;
+		int bufferSize = 4096;
+		for (;;)
+		{
+			message = (char*)alloca(bufferSize + headerSize);
+			memcpy(message, header, headerSize);
+
+			int requiredSize;
 #if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
+			va_list args;
+			va_start(args, format);
+			{
 				requiredSize = _vscprintf(format, args) + 1;
 				if (requiredSize <= bufferSize)
 				{
 					vsnprintf(message + headerSize, bufferSize, format, args);
-				}
+				}			
+			}
+			va_end(args);
 #else
+	
+			va_list args;
+			va_start(args, format);
+			{
 				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
+			}
+			va_end(args);
 #endif
-				if (requiredSize < 0)
-				{
-					failed = true;
-					break;	// error
-				}
-				else if (requiredSize <= bufferSize)
-					break;	// done
-				else if (requiredSize <= MAX_MESSAGE_SIZE)
-				{
-					// buffer insufficient
-					bufferSize = requiredSize;
-				}
-				else
-				{
-					failed = true;
-					break;
-				}
+			if (requiredSize < 0)
+			{
+				failed = true;
+				break;	// error
+			}
+			else if (requiredSize <= bufferSize)
+				break;	// done
+			else if (requiredSize <= MAX_MESSAGE_SIZE)
+			{
+				// buffer insufficient
+				bufferSize = requiredSize;
+			}
+			else
+			{
+				failed = true;
+				break;
 			}
 		}
-		va_end(args);
+
 
 		if (failed)
 			return;
