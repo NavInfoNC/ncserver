@@ -96,7 +96,7 @@ namespace ncserver
 					vsnprintf(message + headerSize, bufferSize, format, args);
 				}
 #else
-				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args);
+				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
 #endif
 				if (requiredSize < 0)
 				{
@@ -108,7 +108,7 @@ namespace ncserver
 				else if (requiredSize <= MAX_MESSAGE_SIZE)
 				{
 					// buffer insufficient
-					bufferSize = MAX_MESSAGE_SIZE;
+					bufferSize = requiredSize;
 				}
 				else
 				{
