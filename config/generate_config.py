@@ -4,7 +4,7 @@ import sys
 import argparse
 
 def generate_config(program_name):
-    logFormat = R'$template logFormat, "[%timegenerated%] - %hostname% - %syslogtag:R:[A-Za-z]\+\[[0-9]\+\]--end% - [%rawmsg%]\n"'
+    logFormat = R'$template logFormat, "[%timegenerated%] - %hostname% - %syslogtag:R:[A-Za-z]\+\[[0-9]\+\]--end% - %rawmsg%\n"'
     fileFormat = "$template fileFormat, \"/var/log/%s/%%syslogtag:R:[A-Za-z]\\+--end%%-%%$year%%%%$month%%%%$day%%%%$hour%%.log\"" % (program_name)
     filter = ":syslogtag, ereregex, \"%s\\[[0-9]+\\]\" ?fileFormat;logFormat" % (program_name)
     fileName = "/etc/rsyslog.d/%s.conf" % (program_name)
