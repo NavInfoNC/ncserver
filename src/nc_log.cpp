@@ -103,7 +103,7 @@ namespace ncserver
 					failed = true;
 					break;	// error
 				}
-				else if (requiredSize < bufferSize)
+				else if (requiredSize <= bufferSize)
 					break;	// done
 				else if (requiredSize <= MAX_MESSAGE_SIZE)
 				{
