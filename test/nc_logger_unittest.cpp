@@ -59,6 +59,12 @@ TEST_F(NcLogTest, basic)
 	EXPECT_STREQ(lastMessage(), "Hello world");
 }
 
+TEST_F(NcLogTest, raw)
+{
+	ASYNC_LOG_ALERT("Hello world");
+	EXPECT_STREQ(lastMessage(), "Hello world");
+}
+
 TEST_F(NcLogTest, 10k)
 {
 	// 10k*'a' = 'aaaaaaaaaaaaaaaaaaaaaaaa....'
