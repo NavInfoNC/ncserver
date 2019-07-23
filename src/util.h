@@ -26,7 +26,7 @@ SOFTWARE.
 namespace ncserver
 {
 	size_t urlDecode(const char *src, char *dest, size_t destSize);
-#ifndef WIN32
+#if !defined(WIN32)
 	void(*signal(int signo, void(*handler)(int)))(int);
 #endif
 }

@@ -65,7 +65,7 @@ namespace ncserver
 		return i;
 	}
 
-#ifndef WIN32
+#if !defined(WIN32)
 	void(*signal(int signo, void(*handler)(int)))(int)
 	{
 
@@ -73,7 +73,7 @@ namespace ncserver
 		act.sa_handler = handler;
 		sigemptyset(&act.sa_mask);
 		act.sa_flags = 0;
-#ifdef SA_INTERRUPT
+#if defined(SA_INTERRUPT)
 		act.sa_flags |= SA_INTERRUPT;
 #endif
 		if (sigaction(signo, &act, &oact) < 0)

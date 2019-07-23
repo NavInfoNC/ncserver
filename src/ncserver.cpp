@@ -28,7 +28,7 @@ SOFTWARE.
 #include "fcgi_service_io.h"
 #include "util.h"
 
-#ifndef WIN32
+#if !defined(WIN32)
 #include <sys/wait.h>
 #include <sys/mman.h>
 #include <thread>
@@ -155,7 +155,7 @@ namespace ncserver
 
 	NcServer::~NcServer()
 	{
-#ifndef WIN32
+#if !defined(WIN32)
 		delete[] m_children;
 		m_children = NULL;
 		delete[] m_childrenStates;
@@ -179,7 +179,7 @@ namespace ncserver
 		signal(SIGINT, handleExitSignalForNonWorker);
 		signal(SIGTERM, handleExitSignalForNonWorker);
 
-#ifndef WIN32
+#if !defined(WIN32)
 
 		void* sharedMemory = NULL;
 		if ((sharedMemory = mmap(0, sizeof(bool), PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0)) == MAP_FAILED)
@@ -260,7 +260,7 @@ namespace ncserver
 
 		fcgi_init(port);
 
-#ifndef WIN32
+#if !defined(WIN32)
 		if (forkChildren())
 		{
 			identity = Identity::Manager;
@@ -299,7 +299,7 @@ namespace ncserver
 			}
 		}
 
-#ifndef WIN32
+#if !defined(WIN32)
 		if(identity == Identity::Manager)
 #endif
 		{
@@ -362,7 +362,7 @@ namespace ncserver
 
 	void NcServer::reforkAllChildren()
 	{
-#ifndef WIN32
+#if !defined(WIN32)
 		if (m_children == NULL)
 			return;
 
@@ -375,7 +375,7 @@ namespace ncserver
 #endif
 	}
 
-#ifndef WIN32
+#if !defined(WIN32)
 	NcServer::NcServer()
 	{
 		const char* childCountStr = getenv("childCount");

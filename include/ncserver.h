@@ -173,7 +173,7 @@ namespace ncserver
 	public:
 		virtual ~NcServer();
 
-#ifndef WIN32
+#if !defined(WIN32)
 		NcServer();
 		void setChildCount(size_t childCount);
 #endif
@@ -249,7 +249,7 @@ namespace ncserver
 
 		ServerState serve();
 
-#ifndef WIN32
+#if !defined(WIN32)
 		size_t m_childCount;
 		pid_t* m_children;
 		enum ChildState {
