@@ -66,15 +66,21 @@ namespace ncserver
 #endif
 	}
 
-	void NcLog::log(LogLevel logLevel, const char* file, int line, const char* func, const char* format, ...)
+	void NcLog::log(bool hook, LogLevel logLevel, const char* file, int line, const char* func, const char* format, ...)
 	{
 		const static int MAX_MESSAGE_SIZE = 64 * 1024;
 
-		if (logLevel > m_logLevel) 
-			return;
+		if (!hook)
+		{
+			if (logLevel > m_logLevel)
+				return;
+		}
 
 		char header[2048];
-		sprintf(header, R"(%s(%d): %s: [%s] )", file, line, LogLevel_toString(logLevel), func);
+		if (!hook)
+		{
+			sprintf(header, R"(%s(%d): %s: [%s] )", file, line, LogLevel_toString(logLevel), func);
+		}
 		size_t headerSize = strlen(header);
 
 		char* message = NULL;
@@ -82,8 +88,16 @@ namespace ncserver
 		int bufferSize = 4096;
 		for (;;)
 		{
-			message = (char*)alloca(bufferSize + headerSize);
-			memcpy(message, header, headerSize);
+			if (!hook)
+			{
+				message = (char*)alloca(bufferSize + headerSize);
+				memcpy(message, header, headerSize);
+			}
+			else
+			{
+				message = (char*)alloca(bufferSize);
+			}
+
 
 			int requiredSize;
 			va_list args;
@@ -93,10 +107,24 @@ namespace ncserver
 				requiredSize = _vscprintf(format, args) + 1;
 				if (requiredSize <= bufferSize)
 				{
-					vsnprintf(message + headerSize, bufferSize, format, args);
+					if (!hook)
+					{
+						vsnprintf(message + headerSize, bufferSize, format, args);
+					}
+					else
+					{
+						vsnprintf(message, bufferSize, format, args);
+					}
 				}
 #else
-				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
+				if (!hook)
+				{
+					requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
+				}
+				else
+				{
+					requiredSize = vsnprintf(message, bufferSize, format, args) + 1;
+				}
 #endif
 			}
 			va_end(args);
@@ -137,10 +165,10 @@ namespace ncserver
 	}
 
 #if !defined(WIN32)
-	void NcLog::write(int priority, const char *format, ...) {
+	void NcLog::write(LogLevel logLevel, const char *format, ...) {
 		va_list args;
 		va_start(args, format);
-		vsyslog(priority, format, args);
+		vsyslog(logLevel, format, args);
 		va_end(args);
 	}
 	
