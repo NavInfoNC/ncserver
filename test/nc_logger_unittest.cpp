@@ -78,6 +78,9 @@ TEST_F(NcLogTest, raw)
 {
 	ASYNC_RAW_LOG("Hello world");
 	EXPECT_STREQ(lastMessage(), "Hello world");
+
+	ASYNC_RAW_LOG("Hello %s", "cplusplus");
+	EXPECT_STREQ(lastMessage(), "Hello cplusplus");
 }
 
 TEST_F(NcLogTest, 10k)
