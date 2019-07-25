@@ -38,15 +38,13 @@ public:
 		{
 			text = strchr(message, ']') + 2; // skip file, lineno, func name
 		}
-		free(m_lastMessage);
-		if (raw)
-		{
-			m_lastMessage = copyStr(message);
-		}
 		else
 		{
-			m_lastMessage = copyStr(text);
+			text = message;
 		}
+		
+		free(m_lastMessage);
+		m_lastMessage = copyStr(message);
 	}
 	
 protected:
