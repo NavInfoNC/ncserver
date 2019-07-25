@@ -144,6 +144,7 @@ namespace ncserver
 		int bufferSize = 4096;
 		for (;;)
 		{
+			message = (char*)alloca(bufferSize);
 			int requiredSize;
 			va_list args;
 			va_start(args, format);

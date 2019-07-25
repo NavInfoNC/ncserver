@@ -39,7 +39,14 @@ public:
 			text = strchr(message, ']') + 2; // skip file, lineno, func name
 		}
 		free(m_lastMessage);
-		m_lastMessage = copyStr(text);
+		if (raw)
+		{
+			m_lastMessage = copyStr(message);
+		}
+		else
+		{
+			m_lastMessage = copyStr(text);
+		}
 	}
 	
 protected:
@@ -63,9 +70,15 @@ TEST_F(NcLogTest, basic)
 	EXPECT_STREQ(lastMessage(), "Hello world");
 }
 
-TEST_F(NcLogTest, raw)
+TEST_F(NcLogTest, zeroParam)
 {
 	ASYNC_LOG_ALERT("Hello world");
+	EXPECT_STREQ(lastMessage(), "Hello world");
+}
+
+TEST_F(NcLogTest, raw)
+{
+	ASYNC_RAW_LOG("Hello world");
 	EXPECT_STREQ(lastMessage(), "Hello world");
 }
 
