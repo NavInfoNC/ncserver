@@ -27,7 +27,7 @@ SOFTWARE.
 #include <syslog.h>
 #endif
 
-namespace ncserver 
+namespace ncserver
 {
 
 #if defined(WIN32)
@@ -54,14 +54,14 @@ namespace ncserver
 		LogLevel_alert = LOG_ALERT,
 		LogLevel_emerg = LOG_EMERG
 	};
-#endif 
+#endif
 
 	const char* LogLevel_toString(LogLevel o);
 
 	class NcLogDelegate
 	{
 	public:
-		virtual void nclogWillOutputMessage(const char* message) = 0;
+		virtual void nclogWillOutputMessage(bool hasHeader, const char* message) = 0;
 	};
 
 	class NcLog
@@ -92,7 +92,7 @@ namespace ncserver
 		void registerUpdateLogLevelSignal();
 
 		/**
-			@note 
+			@note
 				This function need to be called before used the marco ASYNC_LOG_*.
 				Usually, it is called when the program is initialized.
 			@example
@@ -101,6 +101,8 @@ namespace ncserver
 		void init(const char* serverName, int logLevel);
 
 		void log(LogLevel level, const char* file, int line, const char* func, const char *format, ...);
+
+		void rawLog(const char *format, ...);
 
 		// default = LogLevel_error
 		int logLevel() { return m_logLevel; }
@@ -112,7 +114,8 @@ namespace ncserver
 		NcLog();
 		~NcLog();
 
-		void write(int priority, const char *format, ...);
+		void write(LogLevel logLevel, const char *format, ...);
+		void _log(LogLevel logLevel, const char* header, size_t headerSize, const char* format, va_list argList);
 
 		int m_logLevel;
 		NcLogDelegate* m_delegate;
@@ -120,6 +123,13 @@ namespace ncserver
 
 } // namespace ncserver
 
+
+// raw logs would be logged 'AS IS' and would always be logged
+#define ASYNC_RAW_LOG(fmt, ...) do { \
+	ncserver::NcLog::instance().rawLog(fmt, ##__VA_ARGS__); \
+	}while (0)
+
+// other logs would be logged with a header of format '__FILE__(__LINE__): LOG_LEVEL_STRING: [__FUNCTION__] '
 #define ASYNC_LOG_DEBUG(fmt, ...) do { \
 	ncserver::NcLog::instance().log(ncserver::LogLevel_debug, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)

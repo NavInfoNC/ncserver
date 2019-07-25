@@ -14,11 +14,11 @@ public:
 		m_nclog->registerUpdateLogLevelSignal();
 		m_nclog->init("echo", LogLevel_info);
 	}
-	
+
 	static void TearDownTestCase()
 	{
 	}
-	
+
 	void SetUp()
 	{
 		m_nclog->setDelegate(this);
@@ -31,13 +31,22 @@ public:
 
 	const char* lastMessage() { return m_lastMessage; }
 
-	virtual void nclogWillOutputMessage(const char* message)
+	virtual void nclogWillOutputMessage(bool hasHeader, const char* message)
 	{
-		const char* text = strchr(message, ']') + 2;	// skip file, lineno, func name
+		const char* text = NULL;
+		if (hasHeader)
+		{
+			text = strchr(message, ']') + 2; // skip file, lineno, func name
+		}
+		else
+		{
+			text = message;
+		}
+
 		free(m_lastMessage);
 		m_lastMessage = copyStr(text);
 	}
-	
+
 protected:
 	char* m_lastMessage;
 	static NcLog* m_nclog;
@@ -59,10 +68,19 @@ TEST_F(NcLogTest, basic)
 	EXPECT_STREQ(lastMessage(), "Hello world");
 }
 
-TEST_F(NcLogTest, raw)
+TEST_F(NcLogTest, zeroParam)
 {
 	ASYNC_LOG_ALERT("Hello world");
 	EXPECT_STREQ(lastMessage(), "Hello world");
+}
+
+TEST_F(NcLogTest, raw)
+{
+	ASYNC_RAW_LOG("Hello world");
+	EXPECT_STREQ(lastMessage(), "Hello world");
+
+	ASYNC_RAW_LOG("Hello %s", "cplusplus");
+	EXPECT_STREQ(lastMessage(), "Hello cplusplus");
 }
 
 TEST_F(NcLogTest, 10k)

@@ -68,82 +68,32 @@ namespace ncserver
 
 	void NcLog::log(LogLevel logLevel, const char* file, int line, const char* func, const char* format, ...)
 	{
-		const static int MAX_MESSAGE_SIZE = 64 * 1024;
-
-		if (logLevel > m_logLevel) 
-			return;
-
 		char header[2048];
 		sprintf(header, R"(%s(%d): %s: [%s] )", file, line, LogLevel_toString(logLevel), func);
 		size_t headerSize = strlen(header);
 
-		char* message = NULL;
-		bool failed = false;
-		int bufferSize = 4096;
-		for (;;)
-		{
-			message = (char*)alloca(bufferSize + headerSize);
-			memcpy(message, header, headerSize);
+		va_list argList;
+		va_start(argList, format);
+		_log(logLevel, header, headerSize, format, argList);
+		va_end(argList);
+	}
 
-			int requiredSize;
-			va_list args;
-			va_start(args, format);
-			{
-#if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
-				requiredSize = _vscprintf(format, args) + 1;
-				if (requiredSize <= bufferSize)
-				{
-					vsnprintf(message + headerSize, bufferSize, format, args);
-				}
-#else
-				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
-#endif
-			}
-			va_end(args);
-
-			if (requiredSize < 0)
-			{
-				failed = true;
-				break;	// error
-			}
-			else if (requiredSize <= bufferSize)
-				break;	// done
-			else if (requiredSize <= MAX_MESSAGE_SIZE)
-			{
-				// buffer insufficient
-				bufferSize = requiredSize;
-			}
-			else
-			{
-				failed = true;
-				break;
-			}
-		}
-
-		if (failed)
-			return;
-
-		if (m_delegate != NULL)
-			m_delegate->nclogWillOutputMessage(message);
-		else
-		{
-#if defined(WIN32)
-			printf(message);
-			OutputDebugStringA(message);
-#else
-			write(logLevel, message);
-#endif
-		}
+	void NcLog::rawLog(const char *format, ...)
+	{
+		va_list argList;
+		va_start(argList, format);
+		_log(LogLevel_info, NULL, 0, format, argList);
+		va_end(argList);
 	}
 
 #if !defined(WIN32)
-	void NcLog::write(int priority, const char *format, ...) {
+	void NcLog::write(LogLevel logLevel, const char *format, ...) {
 		va_list args;
 		va_start(args, format);
-		vsyslog(priority, format, args);
+		vsyslog(logLevel, format, args);
 		va_end(args);
 	}
-	
+
     static void _updateLogLevel(int sig)
 	{
 		if (sig == SIGRTMIN + 1)
@@ -193,6 +143,69 @@ namespace ncserver
 		signal(SIGRTMIN + 7, _updateLogLevel);
 		signal(SIGRTMIN + 8, _updateLogLevel);
 #endif
+	}
+
+	void NcLog::_log(LogLevel logLevel, const char* header, size_t headerSize, const char* format, va_list argList)
+	{
+		const static int MAX_MESSAGE_SIZE = 64 * 1024;
+
+		// header being NULL indicates it's a raw log
+		// raw logs shouldn't be filtered
+		if (header != NULL && logLevel > m_logLevel)
+			return;
+
+		char* message = NULL;
+		bool failed = false;
+		int bufferSize = 4096;
+		for (;;)
+		{
+			message = (char*)alloca(bufferSize + headerSize);
+			memcpy(message, header, headerSize);
+
+			int requiredSize;
+#if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
+			requiredSize = _vscprintf(format, argList) + 1;
+			if (requiredSize <= bufferSize)
+			{
+				vsnprintf(message + headerSize, bufferSize, format, argList);
+			}
+#else
+			requiredSize = vsnprintf(message + headerSize, bufferSize, format, argList) + 1;
+#endif
+
+			if (requiredSize < 0)
+			{
+				failed = true;
+				break;	// error
+			}
+			else if (requiredSize <= bufferSize)
+				break;	// done
+			else if (requiredSize <= MAX_MESSAGE_SIZE)
+			{
+				// buffer insufficient
+				bufferSize = requiredSize;
+			}
+			else
+			{
+				failed = true;
+				break;
+			}
+		}
+
+		if (failed)
+			return;
+
+		if (m_delegate != NULL)
+			m_delegate->nclogWillOutputMessage(header != NULL, message);
+		else
+		{
+#if defined(WIN32)
+			printf(message);
+			OutputDebugStringA(message);
+#else
+			write(logLevel, message);
+#endif
+		}
 	}
 
 }
