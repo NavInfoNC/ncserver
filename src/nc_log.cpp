@@ -197,10 +197,10 @@ namespace ncserver
 	}
 
 #if !defined(WIN32)
-	void NcLog::write(int priority, const char *format, ...) {
+	void NcLog::write(LogLevel logLevel, const char *format, ...) {
 		va_list args;
 		va_start(args, format);
-		vsyslog(priority, format, args);
+		vsyslog(logLevel, format, args);
 		va_end(args);
 	}
 	

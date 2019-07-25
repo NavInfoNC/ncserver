@@ -114,7 +114,7 @@ namespace ncserver
 		NcLog();
 		~NcLog();
 
-		void write(int priority, const char *format, ...);
+		void write(LogLevel logLevel, const char *format, ...);
 
 		int m_logLevel;
 		NcLogDelegate* m_delegate;
