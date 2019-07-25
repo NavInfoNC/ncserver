@@ -31,7 +31,7 @@ public:
 
 	const char* lastMessage() { return m_lastMessage; }
 
-	virtual void nclogWillOutputMessage(const char* message)
+	virtual void nclogWillOutputMessage(bool raw, const char* message)
 	{
 		const char* text = strchr(message, ']') + 2;	// skip file, lineno, func name
 		free(m_lastMessage);

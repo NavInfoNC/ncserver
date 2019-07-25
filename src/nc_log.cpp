@@ -124,7 +124,66 @@ namespace ncserver
 			return;
 
 		if (m_delegate != NULL)
-			m_delegate->nclogWillOutputMessage(message);
+			m_delegate->nclogWillOutputMessage(false, message);
+		else
+		{
+#if defined(WIN32)
+			printf(message);
+			OutputDebugStringA(message);
+#else
+			write(logLevel, message);
+#endif
+		}
+	}
+
+	void NcLog::rawLog(const char *format, ...)
+	{
+		const static int MAX_MESSAGE_SIZE = 64 * 1024;
+		char* message = NULL;
+		bool failed = false;
+		int bufferSize = 4096;
+		for (;;)
+		{
+			int requiredSize;
+			va_list args;
+			va_start(args, format);
+			{
+#if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
+				requiredSize = _vscprintf(format, args) + 1;
+				if (requiredSize <= bufferSize)
+				{
+					vsnprintf(message, bufferSize, format, args);
+				}
+#else
+				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
+#endif
+			}
+			va_end(args);
+
+			if (requiredSize < 0)
+			{
+				failed = true;
+				break;	// error
+			}
+			else if (requiredSize <= bufferSize)
+				break;	// done
+			else if (requiredSize <= MAX_MESSAGE_SIZE)
+			{
+				// buffer insufficient
+				bufferSize = requiredSize;
+			}
+			else
+			{
+				failed = true;
+				break;
+			}
+		}
+
+		if (failed)
+			return;
+
+		if (m_delegate != NULL)
+			m_delegate->nclogWillOutputMessage(true, message);
 		else
 		{
 #if defined(WIN32)

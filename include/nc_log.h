@@ -61,7 +61,7 @@ namespace ncserver
 	class NcLogDelegate
 	{
 	public:
-		virtual void nclogWillOutputMessage(const char* message) = 0;
+		virtual void nclogWillOutputMessage(bool raw, const char* message) = 0;
 	};
 
 	class NcLog
@@ -102,6 +102,8 @@ namespace ncserver
 
 		void log(LogLevel level, const char* file, int line, const char* func, const char *format, ...);
 
+		void rawLog(const char *format, ...);
+
 		// default = LogLevel_error
 		int logLevel() { return m_logLevel; }
 		void setLogLevel(int logLevel) { m_logLevel = logLevel; }
@@ -119,6 +121,10 @@ namespace ncserver
 	};
 
 } // namespace ncserver
+
+#define ASYNC_RAW_LOG(fmt, ...) do { \
+	ncserver::NcLog::instance().rawLog(fmt, ##__VA_ARGS__); \
+}w
 
 #define ASYNC_LOG_DEBUG(fmt, ...) do { \
 	ncserver::NcLog::instance().log(ncserver::LogLevel_debug, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
