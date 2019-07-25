@@ -155,7 +155,7 @@ namespace ncserver
 					vsnprintf(message, bufferSize, format, args);
 				}
 #else
-				requiredSize = vsnprintf(message + headerSize, bufferSize, format, args) + 1;
+				requiredSize = vsnprintf(message, bufferSize, format, args) + 1;
 #endif
 			}
 			va_end(args);
@@ -190,7 +190,7 @@ namespace ncserver
 			printf(message);
 			OutputDebugStringA(message);
 #else
-			write(logLevel, message);
+			write(ncserver::LogLevel_debug, message);
 #endif
 		}
 	}

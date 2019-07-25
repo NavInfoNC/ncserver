@@ -124,7 +124,7 @@ namespace ncserver
 
 #define ASYNC_RAW_LOG(fmt, ...) do { \
 	ncserver::NcLog::instance().rawLog(fmt, ##__VA_ARGS__); \
-}w
+	}while (0)
 
 #define ASYNC_LOG_DEBUG(fmt, ...) do { \
 	ncserver::NcLog::instance().log(ncserver::LogLevel_debug, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \

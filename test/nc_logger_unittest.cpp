@@ -33,7 +33,11 @@ public:
 
 	virtual void nclogWillOutputMessage(bool raw, const char* message)
 	{
-		const char* text = strchr(message, ']') + 2;	// skip file, lineno, func name
+		const char* text = NULL;
+		if (!raw)
+		{
+			text = strchr(message, ']') + 2; // skip file, lineno, func name
+		}
 		free(m_lastMessage);
 		m_lastMessage = copyStr(text);
 	}
