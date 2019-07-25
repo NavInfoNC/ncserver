@@ -14,11 +14,11 @@ public:
 		m_nclog->registerUpdateLogLevelSignal();
 		m_nclog->init("echo", LogLevel_info);
 	}
-	
+
 	static void TearDownTestCase()
 	{
 	}
-	
+
 	void SetUp()
 	{
 		m_nclog->setDelegate(this);
@@ -31,10 +31,10 @@ public:
 
 	const char* lastMessage() { return m_lastMessage; }
 
-	virtual void nclogWillOutputMessage(bool raw, const char* message)
+	virtual void nclogWillOutputMessage(bool hasHeader, const char* message)
 	{
 		const char* text = NULL;
-		if (!raw)
+		if (hasHeader)
 		{
 			text = strchr(message, ']') + 2; // skip file, lineno, func name
 		}
@@ -42,11 +42,11 @@ public:
 		{
 			text = message;
 		}
-		
+
 		free(m_lastMessage);
-		m_lastMessage = copyStr(message);
+		m_lastMessage = copyStr(text);
 	}
-	
+
 protected:
 	char* m_lastMessage;
 	static NcLog* m_nclog;

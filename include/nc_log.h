@@ -27,7 +27,7 @@ SOFTWARE.
 #include <syslog.h>
 #endif
 
-namespace ncserver 
+namespace ncserver
 {
 
 #if defined(WIN32)
@@ -54,14 +54,14 @@ namespace ncserver
 		LogLevel_alert = LOG_ALERT,
 		LogLevel_emerg = LOG_EMERG
 	};
-#endif 
+#endif
 
 	const char* LogLevel_toString(LogLevel o);
 
 	class NcLogDelegate
 	{
 	public:
-		virtual void nclogWillOutputMessage(bool raw, const char* message) = 0;
+		virtual void nclogWillOutputMessage(bool hasHeader, const char* message) = 0;
 	};
 
 	class NcLog
@@ -92,7 +92,7 @@ namespace ncserver
 		void registerUpdateLogLevelSignal();
 
 		/**
-			@note 
+			@note
 				This function need to be called before used the marco ASYNC_LOG_*.
 				Usually, it is called when the program is initialized.
 			@example
@@ -115,6 +115,7 @@ namespace ncserver
 		~NcLog();
 
 		void write(LogLevel logLevel, const char *format, ...);
+		void _log(LogLevel logLevel, const char* header, size_t headerSize, const char* format, va_list argList);
 
 		int m_logLevel;
 		NcLogDelegate* m_delegate;
