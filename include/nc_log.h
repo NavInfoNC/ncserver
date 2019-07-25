@@ -123,10 +123,13 @@ namespace ncserver
 
 } // namespace ncserver
 
+
+// raw logs would be logged 'AS IS' and would always be logged
 #define ASYNC_RAW_LOG(fmt, ...) do { \
 	ncserver::NcLog::instance().rawLog(fmt, ##__VA_ARGS__); \
 	}while (0)
 
+// other logs would be logged with a header of format '__FILE__(__LINE__): LOG_LEVEL_STRING: [__FUNCTION__] '
 #define ASYNC_LOG_DEBUG(fmt, ...) do { \
 	ncserver::NcLog::instance().log(ncserver::LogLevel_debug, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	}while (0)

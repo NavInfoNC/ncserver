@@ -149,6 +149,8 @@ namespace ncserver
 	{
 		const static int MAX_MESSAGE_SIZE = 64 * 1024;
 
+		// header being NULL indicates it's a raw log
+		// raw logs shouldn't be filtered
 		if (header != NULL && logLevel > m_logLevel)
 			return;
 
