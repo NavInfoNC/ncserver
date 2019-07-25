@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <stdio.h>
-#include <cstdarg>
 #include "nc_log.h"
 #include "util.h"
 

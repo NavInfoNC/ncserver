@@ -27,6 +27,8 @@ SOFTWARE.
 #include <syslog.h>
 #endif
 
+#include <cstdarg>
+
 namespace ncserver
 {
 
