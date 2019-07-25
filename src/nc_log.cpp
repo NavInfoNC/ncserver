@@ -57,7 +57,7 @@ namespace ncserver
 #endif
 	}
 
-	void NcLog::init(const char* serverName, int logLevel)
+	void NcLog::init(const char* serverName, LogLevel logLevel)
 	{
 		m_logLevel = logLevel;
 #if !defined(WIN32)
@@ -199,10 +199,10 @@ namespace ncserver
 		else
 		{
 #if defined(WIN32)
-			printf(message);
+			printf("%s\n", message);
 			OutputDebugStringA(message);
 #else
-			write(logLevel, message);
+			write(logLevel, "%s\n", message);
 #endif
 		}
 	}
