@@ -101,35 +101,35 @@ namespace ncserver
 	{
 		if (sig == SIGRTMIN + 1)
 		{
-			NcLog::instance().setLogLevel(LOG_DEBUG);
+			NcLog::instance().setLogLevel(LogLevel_debug);
 		}
 		else if (sig == SIGRTMIN + 2)
 		{
-			NcLog::instance().setLogLevel(LOG_INFO);
+			NcLog::instance().setLogLevel(LogLevel_info);
 		}
 		else if (sig == SIGRTMIN + 3)
 		{
-			NcLog::instance().setLogLevel(LOG_NOTICE);
+			NcLog::instance().setLogLevel(LogLevel_notice);
 		}
 		else if (sig == SIGRTMIN + 4)
 		{
-			NcLog::instance().setLogLevel(LOG_WARNING);
+			NcLog::instance().setLogLevel(LogLevel_warning);
 		}
 		else if (sig == SIGRTMIN + 5)
 		{
-			NcLog::instance().setLogLevel(LOG_ERR);
+			NcLog::instance().setLogLevel(LogLevel_error);
 		}
 		else if (sig == SIGRTMIN + 6)
 		{
-			NcLog::instance().setLogLevel(LOG_CRIT);
+			NcLog::instance().setLogLevel(LogLevel_crit);
 		}
 		else if (sig == SIGRTMIN + 7)
 		{
-			NcLog::instance().setLogLevel(LOG_ALERT);
+			NcLog::instance().setLogLevel(LogLevel_alert);
 		}
 		else if (sig == SIGRTMIN + 8)
 		{
-			NcLog::instance().setLogLevel(LOG_EMERG);
+			NcLog::instance().setLogLevel(LogLevel_emerg);
 		}
 	}
 #endif
