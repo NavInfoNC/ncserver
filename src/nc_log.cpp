@@ -65,10 +65,14 @@ namespace ncserver
 #endif
 	}
 
+#if defined (WIN32)
+#define snprintf _snprintf
+#endif
+
 	void NcLog::log(LogLevel logLevel, const char* file, int line, const char* func, const char* format, ...)
 	{
 		char header[2048];
-		sprintf(header, R"(%s(%d): %s: [%s] )", file, line, LogLevel_toString(logLevel), func);
+		snprintf(header, 2048, R"(%s(%d): %s: [%s] )", file, line, LogLevel_toString(logLevel), func);
 		size_t headerSize = strlen(header);
 
 		va_list argList;
@@ -203,7 +207,7 @@ namespace ncserver
 			OutputDebugStringA(message);
 			OutputDebugStringA("\n");
 #else
-			write(logLevel, "%s\n", message);
+			write(logLevel, "%s", message);
 #endif
 		}
 	}

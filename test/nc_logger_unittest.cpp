@@ -167,7 +167,7 @@ TEST_F(NcLogTest, logPrintOnWindows)
 
 		char* expectedLog = (char*)malloc(4096);
 		memset(expectedLog, 0, 4096);
-		sprintf(expectedLog,
+		_snprintf(expectedLog, 4096,
 			"%s(%d): %s: [%s] This is a log that would be printed on stdout.\n"
 			"%s(%d): %s: [%s] And this log should be printed in a new line.\n",
 			fileName, line1, LogLevel_toString(LogLevel_notice), functionName,
