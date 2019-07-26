@@ -118,7 +118,7 @@ TEST_F(NcLogTest, logLevel)
 {
 	LogLevel originalLevel = NcLog::instance().logLevel();
 
-	NcLog::instance().setLogLevel(LogLevel_notice);
+ 	NcLog::instance().setLogLevel(LogLevel_notice);
 	EXPECT_EQ(NcLog::instance().logLevel(), LogLevel_notice);
 	ASYNC_LOG_NOTICE("notice 1");
 	EXPECT_STREQ(lastMessage(), "notice 1");
@@ -137,3 +137,48 @@ TEST_F(NcLogTest, logLevel)
 
 	NcLog::instance().setLogLevel(originalLevel);
 }
+
+#if !defined(LINUX)
+TEST_F(NcLogTest, logPrintOnWindows)
+{
+	NcLog::instance().setDelegate(NULL);
+
+	const char* fileName = __FILE__;
+	const char* functionName = __FUNCTION__;
+
+	int standardOut = _dup(1);
+	FILE* logFile = freopen("abc.log", "w", stdout);
+	ASYNC_LOG_NOTICE("This is a log that would be printed on stdout."); int line1 = __LINE__;
+	ASYNC_LOG_INFO("And this log should be printed in a new line."); int line2 = __LINE__;
+	fflush(logFile);
+	_dup2(standardOut, 1);
+
+	logFile = fopen("abc.log", "r");
+	int start = ftell(logFile);
+	fseek(logFile, 0, SEEK_END);
+	int fileLen = ftell(logFile) - start;
+	fseek(logFile, 0, SEEK_SET);
+	EXPECT_GT(fileLen, 0);
+	if (fileLen > 0)
+	{
+		char* actualLog = (char*)malloc(fileLen +1);
+		memset(actualLog, 0, fileLen + 1);
+		fread(actualLog, fileLen, 1, logFile);
+
+		char* expectedLog = (char*)malloc(4096);
+		memset(expectedLog, 0, 4096);
+		sprintf(expectedLog,
+			"%s(%d): %s: [%s] This is a log that would be printed on stdout.\n"
+			"%s(%d): %s: [%s] And this log should be printed in a new line.\n",
+			fileName, line1, LogLevel_toString(LogLevel_notice), functionName,
+			fileName, line2, LogLevel_toString(LogLevel_info), functionName);
+
+		EXPECT_STREQ(actualLog, expectedLog);
+		free(expectedLog);
+		free(actualLog);
+	}
+	fclose(logFile);
+	remove("abc.log");
+}
+
+#endif

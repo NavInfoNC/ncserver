@@ -14,6 +14,4 @@
 #	include <unistd.h>
 #endif
 
-#include "fcgi_stdio.h"
-
 char* fcgi_strtok_s(char* buf, const char* spliters, char** context);
