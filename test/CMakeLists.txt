@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-set (PROJ_NAME echo)
+set (PROJ_NAME ncserver_test)
 project(${PROJ_NAME})
 
 set (BASE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/..)
@@ -14,6 +14,7 @@ include_directories(
 	${BASE_PATH}
 	${INCLUDE_PATH}
 	${LIB_PATH}
+	${BASE_PATH}/gtest
 )
 
 link_directories(
@@ -21,16 +22,18 @@ link_directories(
 )
 
 FILE(GLOB SOURCE "${SOURCE_PATH}/*.cpp")
+FILE(GLOB GTEST "${BASE_PATH}/gtest/*.cc")
 
 message(STATUS ${SOURCE})
 
-add_executable(${PROJ_NAME} ${SOURCE})
+add_executable(${PROJ_NAME} ${SOURCE} ${GTEST})
 
 target_link_libraries(${PROJ_NAME}
 	m
 	rt
 	dl
 	ncserver
+	pthread
 	dl
 	rt
 	m
