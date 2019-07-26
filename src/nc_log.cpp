@@ -201,6 +201,7 @@ namespace ncserver
 #if defined(WIN32)
 			printf("%s\n", message);
 			OutputDebugStringA(message);
+			OutputDebugStringA("\n");
 #else
 			write(logLevel, "%s\n", message);
 #endif
