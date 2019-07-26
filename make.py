@@ -5,10 +5,7 @@ def system(cmd):
 	if os.system(cmd) != 0:
 		raise "Failed to execute cmd:", cmd
 
-if platform.system() == "Windows":
-	system("mbmake.py build -p x64")
-	system("mbmake.py build -p x64 --release")
-elif platform.system() == "Linux":
+if platform.system() == "Linux":
 
 	if not os.path.isdir("tmp"):
 		os.mkdir("tmp")
@@ -16,4 +13,5 @@ elif platform.system() == "Linux":
 
 	system("cmake -G \"Unix Makefiles\" ..")
 	system("make")
-
+else:
+	print "Only support Linux"
