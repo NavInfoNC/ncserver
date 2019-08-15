@@ -116,7 +116,7 @@ Build and Test
   So we finish most of the work on Windows and only compile and deploy service on Linux.
 
 Window下编译&测试
-.................
+^^^^^^^^^^^^^^^^^
 
 按照以下步骤编译和测试。
 
@@ -141,7 +141,7 @@ Window下编译&测试
 4. 运行test.py。或者直接访问http://127.0.0.1/echo?text=abc
 
 Ubuntu下编译&测试
-.................
+^^^^^^^^^^^^^^^^^
 
 首先，配置nginx。让 Nginx 把请求转发给 Unix Domain Socket。
 
