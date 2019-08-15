@@ -1,10 +1,10 @@
-ncserver
-========
+一个认真的 C++ HTTP 服务框架
+============================
 
 中文 | `English <../README.rst>`__
 
-ncserver是基于FastCGI和Nginx的一个C++在线服务开发框架。
-在NavInfo，它是我们开发出搜索、算路、路况等服务的基础。
+**ncserver** 是基于 FastCGI 和 Nginx 的C++在线服务开发框架。
+在NavInfo，它是我们算路、搜索、路况等所有导航相关服务的基础。
 
 .. image:: docs/architecture.png
 

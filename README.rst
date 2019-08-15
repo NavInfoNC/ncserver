@@ -1,11 +1,11 @@
-ncserver
-========
+A Serious C++ HTTP Service Framework
+====================================
 
 `中文 <docs/README.chs.rst>`__ | English
 
 .. __Chinese: README.chs.rst
 
-ncserver is a C++ HTTP service framework based on FastCGI.
+**ncserver** is a C++ HTTP service framework based on FastCGI.
 In NavInfo, all our navigation related services(routing, poi seaching, traffic information etc) are based on this framework.
 
 .. image:: docs/architecture.png
