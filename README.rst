@@ -180,7 +180,77 @@ ncserverctl
 
 `ncserverctl` is the managment program for ncserver services. It's used to start/stop/restart/reload a service.
 
-.. warning:: Needs docmentation
+   | 用法 ：ncserverctl ${operation} [options] ${server_name}
+   | 详细使用方法可查看帮助：ncserverctl --help or ncserverctl ${operation} --help
+
+部署要求
+^^^^^^^^
+
+1. 服务的程序和数据，都要安装在 /etc/ncserver 下。每个服务一个目录::
+
+      $ ls
+      tile-server
+      route-server
+      junction-view-server
+      ti-tile-server
+
+2. The files in each folder must obey the following rules:
+   
+   a. The name of the executable must be the same as the folder itself.
+   b. The name of the configuration file must be the same as the folder itself, such as SERVEICE.ini or SERVICE.json
+   c. Each server must contains a test script::
+
+         $ cd /etc/ncserver/route-server
+         $ ls
+         route-server      // the executable
+         route-server.ini  // the configuration file
+         test.py       // server's test file
+
+Stop/Stop Service
+^^^^^^^^^^^^^^^^^
+
+**ncserverctl** is used to start/stop/reload a server::
+
+   $ ncserverctl start route-server
+   Starting 'route-server' on domain socket unix:/etc/ncserver/route-server/.ncserver.sock
+   Done
+   $ ncserverctl reload route-server
+   $ ncserverctl stop route-server
+
+By starting a server, a Unix domain socket is created. It's located in "/etc/ncserver/SERVICE/.ncserver.sock".
+
+Run the test
+^^^^^^^^^^^^
+
+The test script must run test on local server. which is "https://localhost/".
+
+To run the test::
+
+   $ ncserverctl route-server test
+   test_child_process_age (__main__.RoutingServerTest) ... skipped 'no longer needed after switching to shared memory structure'
+   test_enroute_cities (__main__.RoutingServerTest) ... ok
+   test_enroute_restriction (__main__.RoutingServerTest) ... ok
+   test_past_eta (__main__.RoutingServerTest) ... ok
+   test_route (__main__.RoutingServerTest) ... ok
+   test_route_brief (__main__.RoutingServerTest) ... ok
+   test_route_diffusion (__main__.RoutingServerTest) ... ok
+
+   ----------------------------------------------------------------------
+   Ran 7 tests in 0.720s
+
+Change log level
+^^^^^^^^^^^^^^^^
+
+Service log level can be dynamically adjusted by **ncserverctl**::
+
+   $ ncserverctl chloglvl debug route-server
+
+Other
+^^^^^
+
+ncserverctl 支持.ncserver.yaml配置文件 ( 配置文件目录/etc/ncserver/**${server_name}**/ )。
+目前，worker进程数目可在.ncserver.yaml文件中配置 **processCount: 8**，否则会使用默认值4。
+其他可根据服务的需求，进一步定制化。
 
 项目背景
 --------
