@@ -99,16 +99,23 @@
 本项目包含内容
 --------------
 
-1. 源代码。可以编译为静态库使用。也可以直接加入工程使用。
-2. 服务管理脚本 ncserverctl
-3. 一个 example 程序。见 "example" 目录。
-4. 预先配置好的Windows版Nginx，方便测试。见dependency目录。
+* **源代码**: 可以编译为静态库使用。也可以直接加入工程使用。
+* **服务管理脚本**: ncserverctl
+* **example 服务**: 见 "example" 目录。
+* **Windows 版 Nginx**: 预先配置好了，方便测试。见dependency目录。
 
-ncserver支持Linux和Windows。Windows只能用于功能调试，不能提供多进程支持和好的性能。
-Linux用于压力测试和正式产品部署。
+编译 & 测试
+-----------
+
+`ncserver` 支持 Linux 和 Windows 。
+
+* Linux 用于正式产品部署。
+* Windows 只能用于功能调试，不能提供多进程支持和全部功能。
+  但是我们认为 Visual Studio 是任何一个注重效率的C++开发者都必不可少的 IDE。
+  所以我们通常在Windows下完成全部开发调试，然后在Linux上编译和部署。
 
 Window下编译&测试
------------------
+.................
 
 按照以下步骤编译和测试。
 
@@ -122,8 +129,8 @@ Window下编译&测试
             include        fastcgi_params;
          }
 
-      .. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
-         本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
+   .. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
+      本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
 
 2. 启动dependency/nginx-1.7.2/nginx.exe。
 

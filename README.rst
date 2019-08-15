@@ -3,10 +3,8 @@ A Serious C++ HTTP Service Framework
 
 `中文 <docs/README.chs.rst>`__ | English
 
-.. __Chinese: README.chs.rst
-
 **ncserver** is a C++ HTTP service framework based on FastCGI.
-In NavInfo, all our navigation related services(routing, poi seaching, traffic information etc) are based on this framework.
+In NavInfo, all our navigation related services(routing, poi searching, traffic information etc) are based on this framework.
 
 .. image:: docs/architecture.png
 
@@ -90,7 +88,7 @@ In addition to having a low learning curve, ncserver also provide the following 
    With the help of the COW(copy-on-write) feature of Linux system, all work processes
    can share static memory data. So more workers don't necessarily means more memory consumption.
 
-2. Automatically respawn of worker processes
+2. Automatically re-spawn of worker processes
    
    A daemon process will keep watching on all worker processes.
    If one worker process crashed, a new worker process will be spawned.
@@ -102,18 +100,23 @@ In addition to having a low learning curve, ncserver also provide the following 
 What's Included
 ---------------
 
-本项目包括：
+* **Source Code**: Can be compiled into a static library or added to a project directly.
+* **Service Control Program**: `ncserverctl`.
+* **A Example Project**: See "example" folder.
+* **Nginx for Windows**: For debugging under Windows. In "dependency" folder.
+  
+Build and Test
+--------------
 
-1. 源代码。可以编译为静态库使用。也可以直接加入工程使用。
-2. 服务管理脚本 ncserverctl
-3. 一个 example 程序。见 "example" 目录。
-4. 预先配置好的Windows版Nginx，方便测试。见dependency目录。
+`ncserver` supports both Linux and Windows.
 
-ncserver支持Linux和Windows。Windows只能用于功能调试，不能提供多进程支持和好的性能。
-Linux用于压力测试和正式产品部署。
+* Linux is used in production environment.
+* Windows is used solely for coding and debugging. It's single processed and doesn't provide all the benefits of ncserver.
+  But we think Visual Studio is indispensable for any productive-minded C++ developer.
+  So we finish most of the work on Windows and only compile and deploy service on Linux.
 
 Window下编译&测试
------------------
+.................
 
 按照以下步骤编译和测试。
 
@@ -127,8 +130,8 @@ Window下编译&测试
             include        fastcgi_params;
          }
 
-      .. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
-         本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
+   .. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
+      本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
 
 2. 启动dependency/nginx-1.7.2/nginx.exe。
 
@@ -138,7 +141,7 @@ Window下编译&测试
 4. 运行test.py。或者直接访问http://127.0.0.1/echo?text=abc
 
 Ubuntu下编译&测试
------------------
+.................
 
 首先，配置nginx。让 Nginx 把请求转发给 Unix Domain Socket。
 
@@ -171,15 +174,6 @@ Ubuntu下编译&测试
    Query String: city=beijing&keyword=coffee
    city: beijing
    keyword: coffee
-
-API说明
--------
-
-Example目录下，实现了一个最简单的样例服务echo.cpp。可以参考。
-
-1. 包含头文件 ncserver.h
-2. 继承 ncserver::NcServer 类，实现相关接口。只有NcServer::query()必须实现。
-3. 在 main() 中实例化 NcServer 的子类，并调用 runAndFork(PORT)。PORT只在Windows下起作用。
    
 ncserverctl
 -----------
