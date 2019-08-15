@@ -1,19 +1,17 @@
 ncserver
 ========
 
-`中文 <docs/README.chs.rst>`__ | English
+中文 | `English<../README.rst>`__
 
-.. __Chinese: README.chs.rst
-
-ncserver is a C++ HTTP service framework based on FastCGI.
-In NavInfo, all our navigation related services(routing, poi seaching, traffic information etc) are based on this framework.
+ncserver是基于FastCGI和Nginx的一个C++在线服务开发框架。
+在NavInfo，它是我们开发出搜索、算路、路况等服务的基础。
 
 .. image:: docs/architecture.png
 
-A Simple Example
-----------------
+样例程序
+--------
 
-This example program (in folder "example") shows the basic function of ncserver.
+本样例(在"example"目录中)展示了 ncserver 的基本功能。
 
 .. code-block:: cpp
 
@@ -62,7 +60,7 @@ This example program (in folder "example") shows the basic function of ncserver.
       return 0;
    }
 
-Test the program::
+测试效果::
 
    $ curl -I "http://127.0.0.1/echo?city=beijing&keyword=coffee"
    HTTP/1.1 200 OK
@@ -77,32 +75,29 @@ Test the program::
    city: beijing
    keyword: coffee
 
-Features
+优势特性
 --------
 
-In addition to having a low learning curve, ncserver also provide the following benefits:
+除了入门容易之外，ncserver还有以下优势：
 
-1. Multi-process architecture
+1. 多进程架构
    
-   With multi-process architecture. Each process is isolated. 
-   Even if one process crashed, the following requests will not be affected.
+   每个进程都是独立的。即使某个请求导致其中一个进程崩溃，后续请求也不受影响。
 
-   With the help of the COW(copy-on-write) feature of Linux system, all work processes
-   can share static memory data. So more workers don't necessarily means more memory consumption.
+   因为利用了 Linux 操作系统的写时复制(copy-on-write)特性。所以进程可以共享静态内存。
+   即使开很多进程，也不会占用太多内存。
 
-2. Automatically respawn of worker processes
+2. 自动补充 worker 进程
    
-   A daemon process will keep watching on all worker processes.
-   If one worker process crashed, a new worker process will be spawned.
+   Deamon 进程会监控所有worker进程。
+   如果某个 worker 进程崩溃了。会自动补充一个新的worker。
 
-3. No-down-time reload
+3. 无缝(零宕机) reload
    
-   If the configuration file or data file changes, the service can be reloaded with no down-time.
+   如果配置文件或者数据文件改变。服务可以无缝重启。
 
-What's Included
----------------
-
-本项目包括：
+本项目包含内容
+--------------
 
 1. 源代码。可以编译为静态库使用。也可以直接加入工程使用。
 2. 服务管理脚本 ncserverctl
@@ -172,21 +167,12 @@ Ubuntu下编译&测试
    city: beijing
    keyword: coffee
 
-API说明
--------
-
-Example目录下，实现了一个最简单的样例服务echo.cpp。可以参考。
-
-1. 包含头文件 ncserver.h
-2. 继承 ncserver::NcServer 类，实现相关接口。只有NcServer::query()必须实现。
-3. 在 main() 中实例化 NcServer 的子类，并调用 runAndFork(PORT)。PORT只在Windows下起作用。
-   
 ncserverctl
 -----------
 
-`ncserverctl` is the managment program for ncserver services. It's used to start/stop/restart/reload a service.
+`ncserverctl` 是服务管理工具，用于 start/stop/restart/reload 服务。
 
-.. warning:: Needs docmentation
+.. warning:: 需要补充
 
 项目背景
 --------
