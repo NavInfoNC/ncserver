@@ -25,9 +25,9 @@ add_definitions(
 )
 
 FILE(GLOB SRC "${BASE_PATH}/src/*.cpp" "${BASE_PATH}/src/*.c")
-FILE(GLOB_RECURSE SRC "${BASE_PATH}/3rd-party/*.cpp" "${BASE_PATH}/3rd-party/*.c")
+FILE(GLOB_RECURSE 3RD_SRC "${BASE_PATH}/3rd-party/*.cpp" "${BASE_PATH}/3rd-party/*.c")
 
-add_library(ncserver${LIB_SUFFIX} STATIC ${SRC} ${FCGI_SRC} ${YAML_SRC})
+add_library(ncserver${LIB_SUFFIX} STATIC ${SRC} ${3RD_SRC})
 
 ADD_SUBDIRECTORY (example)
 ADD_SUBDIRECTORY (test)
