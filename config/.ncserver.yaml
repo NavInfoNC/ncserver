@@ -1,2 +1,2 @@
 server:
-    processCount: 4 
+    workerCount: 4 # worker process count, default as 4

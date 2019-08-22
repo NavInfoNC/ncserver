@@ -386,9 +386,9 @@ namespace ncserver
 		YAML::Node config = YAML::LoadFile("./.ncserver.yaml");
 		if(config["server"])
 		{
-			if(config["server"]["processCount"])
+			if(config["server"]["workerCount"])
 			{
-				setChildCount(config["server"]["processCount"].as<size_t>());
+				setChildCount(config["server"]["workerCount"].as<size_t>());
 			}
 		}
 	}
