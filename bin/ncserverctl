@@ -1,0 +1,219 @@
+#!/usr/bin/env python
+
+import os, sys, signal, time, stat 
+import subprocess, psutil, argparse
+sys.dont_write_bytecode = True
+
+import imp # local local test suite
+
+# todo: add tab completion
+
+g_pid_file = ".pid"
+g_status_file = ".status"
+g_sock_file = ".ncserver.sock"
+g_signal_num_2_name = dict((getattr(signal, n), n) \
+    for n in dir(signal) if n.startswith('SIG') and '_' not in n )
+
+def send_signal(program_name, signal_num):
+    procs = find_procs_by_name(program_name)
+    if len(procs) == 0:
+        return -1
+    cmd = "sudo -u %s killall -s %d %s" % (procs[0].username(), signal_num, os.path.basename(program_name))
+    try:
+        subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError as e:
+        print("Failed to send %s signal, error code: %d, message: %s" % (g_signal_num_2_name[signal_num], e.returncode, e.output))
+        return e.returncode
+    else:
+        return 0
+
+def send_signal_to_process(pid, signal_num):
+    try:
+        proc = psutil.Process(pid)
+    except psutil.NoSuchProcess as e:
+        print("Process not found: %d, error code: %d, message: %s" % (e.returncode, e.output))
+        return -1
+    cmd = "sudo -u %s kill -s %d %d" % (proc.username(), signal_num, pid)
+    try:
+        subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError as e:
+        print("Failed to send %s signal, error code: %s, message: %s" % (g_signal_num_2_name[signal_num], e.returncode, e.output))
+    else:
+        return 0
+
+def is_process_running(program_name):
+    return len(find_procs_by_name(program_name)) != 0
+
+def find_procs_by_name(name):
+    ls = []
+    for p in psutil.process_iter(attrs=['cmdline']):
+        if name in p.info['cmdline']:
+            ls.append(p)
+    return ls
+
+def get_reload_status():
+    status = 1
+    with open(g_status_file) as f:
+        status = int(f.read())
+    return status
+
+def start_process(program_name, child_count):
+
+    if is_process_running(program_name):
+        print("%s has already been running" % program_name)
+        return 0
+    
+    try:
+        os.environ["childCount"] = child_count
+        cmd = "spawn-fcgi -s %s -F 1 -P %s -M 0666 -b 4096 %s" % (g_sock_file, g_pid_file, program_name)
+        subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError as e:
+        print("Failed to start %s, return code: %d, message: %s" % (program_name, e.returncode, e.output))
+        return 1
+    else:
+        print("Starting <%s> on domain socket unix:%s/%s" % (os.path.basename(program_name), os.path.dirname(program_name), g_sock_file))
+        while not is_process_running(program_name):
+            time.sleep(2)
+        file_mode = 0666
+        os.chmod(g_sock_file, file_mode)
+        open(g_pid_file, "a").close()
+        os.chmod(g_pid_file, file_mode)
+        open(g_status_file, "a").close()
+        os.chmod(g_status_file, file_mode)
+        return 0
+
+def stop_process(program_name, signal_num):
+
+    if not is_process_running(program_name):
+        print("%s has already stopped" % program_name)
+        return 0
+
+    if send_signal(program_name, signal_num) != 0:
+        return 1
+    else:
+        while is_process_running(program_name):
+            time.sleep(2)
+        print("%s stopped" % program_name)
+        if os.path.exists(g_pid_file):
+            os.remove(g_pid_file)
+        if os.path.exists(g_sock_file):
+            os.remove(g_sock_file)
+        if os.path.exists(g_status_file):
+            os.remove(g_status_file)
+        return 0
+
+def restart_process(program_name, child_count):
+    if not stop_process(program_name, signal.SIGTERM):
+        if not start_process(program_name, child_count):
+            print("Succeeded in restarting %s" % program_name)
+            return 0 
+        else:
+            print("Failed to restart %s, program has already stopped but cannot start" % program_name)
+            return 1
+    else:
+        print("Failed to restart %s, program cannot be terminated" % program_name)
+        return 1
+
+def reload_process(program_name):
+    if not is_process_running(program_name):
+        child_count = os.getenv("childCount", default="4")
+        return start_process(program_name, child_count)
+
+    with open(g_pid_file, "r") as f:
+        pid = int(f.readline())
+
+    if pid == 0:
+        print(".pid file is wrong")
+        return -1
+
+    if send_signal_to_process(pid, signal.SIGUSR1) != 0:
+        return 1
+
+    with open(g_status_file, "w") as f:
+        f.write("1")
+
+    reload_status = 1
+
+    while reload_status == 1:
+        reload_status = get_reload_status()
+
+    if reload_status == 2:
+        print("Succeeded in Reloading %s" % program_name)
+        return 0
+    else:
+        print("Failed to reload %s" % program_name)
+        return 1
+
+def program_status(program_name, verbosity):
+    procs = find_procs_by_name(program_name)
+    if len(procs) == 0:
+        print("%s has stopped" % program_name)
+    else:
+        pids = [p.pid for p in procs]
+        if verbosity:
+            print("{} is running with {} processes: {}".format(program_name, len(pids), pids))
+        else:
+            print(" ".join([str(p) for p in pids]))
+
+def run_tests(program_dir):
+    test_script_path = "%s/test.py" % program_dir
+    if not os.path.exists(test_script_path):
+        print("%s doesn't exist" % test_script_path)
+        sys.exist(1)
+    try:
+        test = imp.load_source("test", test_script_path)
+    except:
+        print("Failed to load %s" % test_script_path)
+        exc_type, exc_value = sys.exc_info()[:2]
+        print("exception type: %s, value: %s" % (exc_type, exc_value))
+        sys.exit(1)
+    test.main()
+
+def main():
+
+    parser = argparse.ArgumentParser(description="Management of Ncserver")
+    subparsers = parser.add_subparsers(dest="subcommand_name")
+    start_parser = subparsers.add_parser("start", help="start SERVER_NAME if it is not running")
+    start_parser.add_argument("-c", "--child-count", default="4", dest="child_count", help="Assign the worker processes' number to fork, default to 4")
+    subparsers.add_parser("stop", help="stop SERVER_NAME if it is running")
+    subparsers.add_parser("forcekill", help="terminate SERVER_NAME forcefully if it is running")
+    restart_parser = subparsers.add_parser("restart", help="stop SERVER_NAME if it is running, then start it")
+    restart_parser.add_argument("-c", "--child-count", default="4", dest="child_count", help="Assign the worker processes' number to fork, default to 4")
+    subparsers.add_parser("reload", help="reload SERVER_NAME if it is running, otherwise start it")
+    status_parser = subparsers.add_parser("status", help="report SERVER_NAME's current status")
+    status_parser.add_argument("-v", "--verbosity", action="store_true", help="increase the verbosity of output")
+    subparsers.add_parser("test", help="run tests of SERVER_NAME")
+    parser.add_argument("SERVER_NAME", help="module to be operated")
+    parser.add_argument("-d", "--directory", default="/etc/ncserver", dest="server_dir", help="directory where SERVER_NAME resides, default to '/etc/ncserver'")
+
+    try:
+        args = parser.parse_args()
+    except:
+        sys.exit(1)
+
+    server = args.SERVER_NAME
+    program_dir = "%s/%s" %  (args.server_dir, server)
+    if not os.path.isdir(program_dir):
+        print("No module found with the name %s in %s" % (server, args.server_dir))
+        sys.exit(1)
+
+    os.chdir(program_dir)
+    program_name = "%s/%s" % (program_dir, server)
+
+    if args.subcommand_name == "start":
+        return start_process(program_name, args.child_count)
+    elif args.subcommand_name == "stop":
+        return stop_process(program_name, signal.SIGTERM)
+    elif args.subcommand_name == "forcekill":
+        return stop_process(program_name, signal.SIGKILL)
+    elif args.subcommand_name == "reload":
+        return reload_process(program_name)
+    elif args.subcommand_name == "restart":
+        return restart_process(program_name, args.child_count)
+    elif args.subcommand_name == "status":
+        program_status(program_name, args.verbosity)
+    elif args.subcommand_name == "test":
+        run_tests(program_dir)
+
+if __name__ == "__main__":
+    sys.exit(main())
