@@ -30,13 +30,13 @@ SOFTWARE.
 #include "fcgi_service_io.h"
 #include "util.h"
 #include "nc_log.h"
+#include "yaml-cpp/yaml.h"
 
 #ifndef WIN32
 #include <sys/wait.h>
 #include <sys/mman.h>
 #include <thread>
 #include <vector>
-#include "yaml-cpp/yaml.h"
 #endif
 
 bool g_ncServerExit = false;
@@ -252,6 +252,8 @@ namespace ncserver
 		if (identity == Identity::Boss)
 			return SUCCESS;
 
+		loadConfigFile();
+
 		if (!prepareProcess())
 		{
 			return PREPAER_PROCESS_ERROR;
@@ -265,7 +267,6 @@ namespace ncserver
 		fcgi_init(port);
 
 #ifndef WIN32
-		loadConfigYamlFile();
 		if (forkChildren())
 		{
 			identity = Identity::Manager;
@@ -380,6 +381,23 @@ namespace ncserver
 #endif
 	}
 
+	void NcServer::loadConfigFile()
+	{
+		YAML::Node config = YAML::LoadFile("./.ncserver.yaml");
+		if(config["server"])
+		{
+			if(config["server"]["processCount"])
+			{
+				setChildCount(config["server"]["processCount"].as<size_t>());
+			}
+		}
+	}
+
+	void NcServer::setChildCount(size_t childCount)
+	{
+		m_childCount = childCount;
+	}
+
 #ifndef WIN32
 	NcServer::NcServer()
 	{
@@ -402,31 +420,6 @@ namespace ncserver
 
 		m_mutex = PTHREAD_MUTEX_INITIALIZER;
 		pthread_mutex_init(&m_mutex, NULL);
-	}
-
-	void NcServer::setChildCount(size_t childCount)
-	{
-		m_childCount = childCount;
-	}
-
-	void NcServer::loadConfigYamlFile()
-	{
-		YAML::Node config = YAML::LoadFile("./.ncserver.yaml");
-		if(config["server"])
-		{
-			if(config["server"]["processCount"])
-			{
-				setChildCount(config["server"]["processCount"].as<size_t>());
-			}
-			else
-			{
-				ASYNC_LOG_NOTICE("Parse yaml file error: processCount node is not exist!");
-			}
-		}
-		else
-		{
-			ASYNC_LOG_NOTICE("Parse yaml file error: server node is not exist!");
-		}
 	}
 
 	bool NcServer::forkOne(size_t index)

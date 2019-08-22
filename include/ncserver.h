@@ -175,8 +175,9 @@ namespace ncserver
 
 #ifndef WIN32
 		NcServer();
-		void setChildCount(size_t childCount);
 #endif
+
+		void setChildCount(size_t childCount);
 		void reforkAllChildren();
 
 		/**
@@ -249,8 +250,11 @@ namespace ncserver
 
 		ServerState serve();
 
-#ifndef WIN32
+		void loadConfigFile();
+
 		size_t m_childCount;
+
+#ifndef WIN32
 		pid_t* m_children;
 		enum ChildState {
 			CHILDSTATE_INVALID = 0,
@@ -258,7 +262,7 @@ namespace ncserver
 			CHILDSTATE_WAIT_FOR_RELOAD = 2,
 		}* m_childrenStates;
 		pthread_mutex_t m_mutex;
-		void loadConfigYamlFile();
+
 		bool forkOne(size_t index);
 		bool forkChildren();
 		bool checkChildrenStateAndRefork();

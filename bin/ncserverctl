@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, signal, time, stat, yaml
+import os, sys, signal, time, stat
 import subprocess, psutil, argparse
 sys.dont_write_bytecode = True
 
@@ -201,7 +201,7 @@ def main():
     status_parser = subparsers.add_parser("status", help="report SERVER_NAME's current status")
     status_parser.add_argument("-v", "--verbosity", action="store_true", help="increase the verbosity of output")
     subparsers.add_parser("test", help="run tests of SERVER_NAME")
-    log_parser = subparsers.add_parser("chloglvl", help="chang the SERVER_NAME log level")
+    log_parser = subparsers.add_parser("chloglvl", help="change the SERVER_NAME log level")
     log_parser.add_argument("-l", "--level", default="error", dest="log_level", help="reset SERVER_NAME log level {debug,info,notice,warning,error,crit,alert,emerg}, default error")
     parser.add_argument("SERVER_NAME", help="module to be operated")
     parser.add_argument("-d", "--directory", default="/etc/ncserver", dest="server_dir", help="directory where SERVER_NAME resides, default to '/etc/ncserver'")

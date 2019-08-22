@@ -85,7 +85,7 @@
       <Optimization>Disabled</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\include;..\fastcgi\include;..\gtest;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\3rd-party\yaml-cpp\include;..\3rd-party\fastcgi\include;..\gtest;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;AMD64;NDEBUG;_CONSOLE;WIN32;_WINX32_;XXXXX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -105,14 +105,72 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\fastcgi\include\fastcgi.h" />
-    <ClInclude Include="..\fastcgi\include\fcgiapp.h" />
-    <ClInclude Include="..\fastcgi\include\fcgimisc.h" />
-    <ClInclude Include="..\fastcgi\include\fcgio.h" />
-    <ClInclude Include="..\fastcgi\include\fcgios.h" />
-    <ClInclude Include="..\fastcgi\include\fcgi_config.h" />
-    <ClInclude Include="..\fastcgi\include\fcgi_config_x86.h" />
-    <ClInclude Include="..\fastcgi\include\fcgi_stdio.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fastcgi.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fcgiapp.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fcgimisc.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fcgio.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fcgios.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fcgi_config.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fcgi_config_x86.h" />
+    <ClInclude Include="..\3rd-party\fastcgi\include\fcgi_stdio.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\anchor.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\binary.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\contrib\anchordict.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\contrib\graphbuilder.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\dll.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\emitfromevents.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\emitter.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\emitterdef.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\emittermanip.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\emitterstyle.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\eventhandler.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\exceptions.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\mark.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\convert.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\bool_type.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\impl.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\iterator.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\iterator_fwd.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\memory.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\node.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\node_data.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\node_iterator.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\node_ref.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\emit.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\impl.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\iterator.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\node.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\parse.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\ptr.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\type.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\null.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\ostream_wrapper.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\parser.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\stlemitter.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\traits.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\yaml.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\collectionstack.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\contrib\graphbuilderadapter.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\directives.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\emitterstate.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\emitterutils.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\exp.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\indentation.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\nodebuilder.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\nodeevents.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\ptr_vector.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\regeximpl.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\regex_yaml.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\scanner.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\scanscalar.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\scantag.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\setting.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\singledocparser.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\stream.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\streamcharsource.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\stringsource.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\tag.h" />
+    <ClInclude Include="..\3rd-party\yaml-cpp\src\token.h" />
     <ClInclude Include="..\gtest\gtest.h" />
     <ClInclude Include="..\include\ncserver.h" />
     <ClInclude Include="..\include\nc_log.h" />
@@ -122,25 +180,25 @@
     <ClInclude Include="..\test\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\fastcgi\libfcgi\fcgiapp.c">
+    <ClCompile Include="..\3rd-party\fastcgi\libfcgi\fcgiapp.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="..\fastcgi\libfcgi\fcgio.cpp">
+    <ClCompile Include="..\3rd-party\fastcgi\libfcgi\fcgio.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="..\fastcgi\libfcgi\fcgi_stdio.c">
+    <ClCompile Include="..\3rd-party\fastcgi\libfcgi\fcgi_stdio.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="..\fastcgi\libfcgi\os_unix.c">
+    <ClCompile Include="..\3rd-party\fastcgi\libfcgi\os_unix.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -148,11 +206,101 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="..\fastcgi\libfcgi\os_win32.c">
+    <ClCompile Include="..\3rd-party\fastcgi\libfcgi\os_win32.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\binary.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\contrib\graphbuilder.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\contrib\graphbuilderadapter.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\convert.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\directives.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\emit.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\emitfromevents.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\emitter.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\emitterstate.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\emitterutils.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\exceptions.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\exp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\memory.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\node.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\nodebuilder.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\nodeevents.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\node_data.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\null.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\ostream_wrapper.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\parse.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\parser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\regex_yaml.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\scanner.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\scanscalar.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\scantag.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\scantoken.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\simplekey.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\singledocparser.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\stream.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\3rd-party\yaml-cpp\src\tag.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\gtest\gtest-all.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
