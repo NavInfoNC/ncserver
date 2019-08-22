@@ -35,6 +35,7 @@ SOFTWARE.
 #include <sys/mman.h>
 #include <thread>
 #include <vector>
+#include "yaml-cpp/yaml.h"
 #endif
 
 bool g_ncServerExit = false;
@@ -404,6 +405,18 @@ namespace ncserver
 	void NcServer::setChildCount(size_t childCount)
 	{
 		m_childCount = childCount;
+	}
+
+	void NcServer::loadConfigYamlFile()
+	{
+		YAML::Node config = YAML::LoadFile("./.ncserver.yaml");
+		if(config["server"])
+		{
+			if(config["server"]["processCount"])
+			{
+				setChildCount(config["server"]["processCount"].as<size_t>());
+			}
+		}
 	}
 
 	bool NcServer::forkOne(size_t index)

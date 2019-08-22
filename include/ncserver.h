@@ -258,7 +258,7 @@ namespace ncserver
 			CHILDSTATE_WAIT_FOR_RELOAD = 2,
 		}* m_childrenStates;
 		pthread_mutex_t m_mutex;
-
+		void loadConfigYamlFile();
 		bool forkOne(size_t index);
 		bool forkChildren();
 		bool checkChildrenStateAndRefork();

@@ -10,9 +10,13 @@ include_directories(
 	${BASE_PATH}/fastcgi/include
 )
 
+link_directories ("${BASE_PATH}/dependency/lib")
+
 SET (CMAKE_CXX_FLAGS "-std=c++11")
 SET (LIB_SUFFIX "")
-	
+set (DEPENDENT_LIB
+	libyaml.a
+	)	
 add_definitions(
 	-DNDEBUG
 	-DLINUX
@@ -26,7 +30,7 @@ add_definitions(
 FILE(GLOB SRC "${BASE_PATH}/src/*.cpp" "${BASE_PATH}/src/*.c")
 FILE(GLOB FCGI_SRC "${BASE_PATH}/fastcgi/libfcgi/*.cpp" "${BASE_PATH}/fastcgi/libfcgi/*.c")
 
-add_library(ncserver${LIB_SUFFIX} STATIC ${SRC} ${FCGI_SRC})
+add_library(ncserver${LIB_SUFFIX} STATIC ${SRC} ${FCGI_SRC} ${DEPENDENT_LIB})
 
 ADD_SUBDIRECTORY (example)
 ADD_SUBDIRECTORY (test)
