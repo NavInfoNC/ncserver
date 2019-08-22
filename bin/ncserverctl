@@ -8,24 +8,11 @@ import imp # local local test suite
 
 # todo: add tab completion
 
-g_child_count = 4
 g_pid_file = ".pid"
 g_status_file = ".status"
 g_sock_file = ".ncserver.sock"
-g_yaml_file = ".ncserver.yaml"
 g_signal_num_2_name = dict((getattr(signal, n), n) \
     for n in dir(signal) if n.startswith('SIG') and '_' not in n )
-
-def load_yaml_file(program_dir, yaml_file):
-    yaml_path = "%s/%s" %  (program_dir, yaml_file)
-    try:
-        yaml_file_handler = open(yaml_path)
-        yaml_content = yaml.load(yaml_file_handler)
-        global g_child_count 
-        g_child_count = yaml_content['processCount']
-        yaml_file_handler.close()
-    except:
-        print(".ncserver.yaml is not exist! work process count use default value 4")
 
 def send_signal(program_name, signal_num):
     procs = find_procs_by_name(program_name)
@@ -70,14 +57,13 @@ def get_reload_status():
         status = int(f.read())
     return status
 
-def start_process(program_dir, program_name):
-    load_yaml_file(program_dir, g_yaml_file)
+def start_process(program_name):
+
     if is_process_running(program_name):
         print("%s has already been running" % program_name)
         return 0
     
     try:
-        os.environ["childCount"] = str(g_child_count)
         cmd = "spawn-fcgi -s %s -F 1 -P %s -M 0666 -b 4096 %s" % (g_sock_file, g_pid_file, program_name)
         subprocess.check_output(cmd, shell=True)
     except subprocess.CalledProcessError as e:
@@ -115,9 +101,9 @@ def stop_process(program_name, signal_num):
             os.remove(g_status_file)
         return 0
 
-def restart_process(program_dir, program_name):
+def restart_process(program_name):
     if not stop_process(program_name, signal.SIGTERM):
-        if not start_process(program_dir, program_name):
+        if not start_process(program_name):
             print("Succeeded in restarting %s" % program_name)
             return 0 
         else:
@@ -127,9 +113,9 @@ def restart_process(program_dir, program_name):
         print("Failed to restart %s, program cannot be terminated" % program_name)
         return 1
 
-def reload_process(program_dir, program_name):
+def reload_process(program_name):
     if not is_process_running(program_name):
-        return start_process(program_dir, program_name)
+        return start_process(program_name)
 
     with open(g_pid_file, "r") as f:
         pid = int(f.readline())
@@ -235,21 +221,19 @@ def main():
     program_name = "%s/%s" % (program_dir, server)
 
     if args.subcommand_name == "start":
-        return start_process(program_dir, program_name)
+        return start_process(program_name)
     elif args.subcommand_name == "stop":
         return stop_process(program_name, signal.SIGTERM)
     elif args.subcommand_name == "forcekill":
         return stop_process(program_name, signal.SIGKILL)
     elif args.subcommand_name == "reload":
-        return reload_process(program_dir, program_name)
+        return reload_process(program_name)
     elif args.subcommand_name == "restart":
-        return restart_process(program_dir, program_name)
+        return restart_process(program_name)
     elif args.subcommand_name == "status":
         program_status(program_name, args.verbosity)
     elif args.subcommand_name == "test":
         run_tests(program_dir)
-    elif args.subcommand_name == "chloglvl":
-        reset_log_level(program_name, args.log_level)
 
 if __name__ == "__main__":
     sys.exit(main())

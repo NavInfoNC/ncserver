@@ -1,1 +1,2 @@
-processCount: 4 
+server:
+    processCount: 4 

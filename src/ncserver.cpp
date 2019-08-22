@@ -29,6 +29,7 @@ SOFTWARE.
 #include "fcgi_bind.h"
 #include "fcgi_service_io.h"
 #include "util.h"
+#include "nc_log.h"
 
 #ifndef WIN32
 #include <sys/wait.h>
@@ -264,6 +265,7 @@ namespace ncserver
 		fcgi_init(port);
 
 #ifndef WIN32
+		loadConfigYamlFile();
 		if (forkChildren())
 		{
 			identity = Identity::Manager;
@@ -416,6 +418,14 @@ namespace ncserver
 			{
 				setChildCount(config["server"]["processCount"].as<size_t>());
 			}
+			else
+			{
+				ASYNC_LOG_NOTICE("Parse yaml file error: processCount node is not exist!");
+			}
+		}
+		else
+		{
+			ASYNC_LOG_NOTICE("Parse yaml file error: server node is not exist!");
 		}
 	}
 
