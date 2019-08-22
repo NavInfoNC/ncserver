@@ -383,13 +383,18 @@ namespace ncserver
 
 	void NcServer::loadConfigFile()
 	{
-		YAML::Node config = YAML::LoadFile("./.ncserver.yaml");
-		if(config["server"])
-		{
-			if(config["server"]["workerCount"])
+		try {
+			YAML::Node config = YAML::LoadFile("./.ncserver.yaml");
+			if (config["server"])
 			{
-				setChildCount(config["server"]["workerCount"].as<size_t>());
+				if (config["server"]["workerCount"])
+				{
+					setChildCount(config["server"]["workerCount"].as<size_t>());
+				}
 			}
+		}
+		catch (...) {
+			return;
 		}
 	}
 
