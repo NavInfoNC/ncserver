@@ -53,6 +53,8 @@ void RequestParameteterIterator_free(RequestParameteterIterator* o);
 
 namespace ncserver
 {
+	class NcServerConfig;
+
 	class ServiceIo
 	{
 	public:
@@ -171,12 +173,9 @@ namespace ncserver
 	class NcServer
 	{
 	public:
+		NcServer();
 		virtual ~NcServer();
 
-#ifndef WIN32
-		NcServer();
-		void setChildCount(size_t childCount);
-#endif
 		void reforkAllChildren();
 
 		/**
@@ -249,8 +248,13 @@ namespace ncserver
 
 		ServerState serve();
 
+		void loadConfigFile();
+
+	private:
+		NcServerConfig* m_config;
+		void reset();
+
 #ifndef WIN32
-		size_t m_childCount;
 		pid_t* m_children;
 		enum ChildState {
 			CHILDSTATE_INVALID = 0,
@@ -259,7 +263,7 @@ namespace ncserver
 		}* m_childrenStates;
 		pthread_mutex_t m_mutex;
 
-		bool forkOne(size_t index);
+		bool forkOne(int index);
 		bool forkChildren();
 		bool checkChildrenStateAndRefork();
 #endif

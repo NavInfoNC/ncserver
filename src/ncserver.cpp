@@ -29,6 +29,8 @@ SOFTWARE.
 #include "fcgi_bind.h"
 #include "fcgi_service_io.h"
 #include "util.h"
+#include "nc_log.h"
+#include "yaml-cpp/yaml.h"
 
 #ifndef WIN32
 #include <sys/wait.h>
@@ -42,6 +44,29 @@ bool g_ncServerReload = false;
 
 namespace ncserver
 {
+	class NcServerConfig
+	{
+	public:
+		struct ServerConfig
+		{
+			int workerCount = 4;
+		};
+
+		static NcServerConfig* alloc() { return new NcServerConfig(); }
+
+		ServerConfig server;
+
+	protected:
+		NcServerConfig() {}
+		~NcServerConfig() {}
+		friend void release(NcServerConfig* config);
+	};
+
+	void release(NcServerConfig* config)
+	{
+		delete config;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	Request::Request()
 	{
@@ -54,27 +79,33 @@ namespace ncserver
 	{
 		return FCGI_getenv("REQUEST_METHOD");
 	}
+
 	const char* Request::contentType()
 	{
 		return FCGI_getenv("CONTENT_TYPE");
 	}
+
 	const char* Request::documentUri()
 	{
 		return FCGI_getenv("DOCUMENT_URI");
 	}
+
 	const char* Request::queryString()
 	{
 		return m_queryString;
 	}
+
 	size_t Request::contentLength()
 	{
 		const char* length = FCGI_getenv("CONTENT_LENGTH");
 		return strtoull(length, NULL, 10);
 	}
+
 	bool Request::isGet()
 	{
 		return strcmp(requestMethod(), "GET") == 0;
 	}
+
 	bool Request::isPost()
 	{
 		return strcmp(requestMethod(), "POST") == 0;
@@ -155,16 +186,77 @@ namespace ncserver
 		g_ncServerReload = true;
 	}
 
+	NcServer::NcServer()
+	{
+		m_config = NcServerConfig::alloc();
+#ifndef WIN32
+		m_children = nullptr;
+		m_childrenStates = nullptr;
+
+		m_mutex = PTHREAD_MUTEX_INITIALIZER;
+		pthread_mutex_init(&m_mutex, NULL);
+#endif
+	}
+
 	NcServer::~NcServer()
 	{
+		release(m_config);
 #ifndef WIN32
 		delete[] m_children;
-		m_children = NULL;
+		m_children = nullptr;
 		delete[] m_childrenStates;
-		m_childrenStates = NULL;
+		m_childrenStates = nullptr;
 
 		pthread_mutex_destroy(&m_mutex);
 #endif
+	}
+
+	void NcServer::reset()
+	{
+#ifndef WIN32
+		int workerCount = m_config->server.workerCount;
+
+		if (workerCount > 0)
+		{
+			m_children = new pid_t[workerCount];
+			m_childrenStates = new ChildState[workerCount];
+
+			memset(m_children, -1, sizeof(pid_t) * workerCount);		// set as -1
+			memset(m_childrenStates, 0, sizeof(pid_t) * workerCount);	// set as CHILDSTATE_INVALID
+		}
+#endif
+	}
+
+	void NcServer::loadConfigFile()
+	{
+		NcServerConfig* tmpConfig = NcServerConfig::alloc();
+
+		try
+		{
+			YAML::Node root = YAML::LoadFile("./.ncserver.yaml");
+
+			YAML::Node serverNode = root["server"];
+			if (serverNode)
+			{
+				NcServerConfig::ServerConfig& serverCfg = tmpConfig->server;
+
+				YAML::Node workerCountCfg = serverNode["workerCount"];
+				if (workerCountCfg)
+				{
+					serverCfg.workerCount = workerCountCfg.as<int>();
+				}
+			}
+
+			release(m_config);
+			m_config = tmpConfig;
+			reset();
+		}
+		// if anything goes wrong during parsing the config file,
+		// the whole file would be ignored.
+		catch (...)
+		{
+			release(tmpConfig);
+		}
 	}
 
 	ServerState NcServer::runAndFork(int port)
@@ -182,17 +274,19 @@ namespace ncserver
 		signal(SIGTERM, handleExitSignalForNonWorker);
 
 #ifndef WIN32
-
 		void* sharedMemory = NULL;
 		if ((sharedMemory = mmap(0, sizeof(bool), PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0)) == MAP_FAILED)
 			return MEMORY_ERROR;
 
 		bool& managerFinishedForking = *(bool*)sharedMemory;
 		pid_t manager = fork();
-		if (manager == 0) {
+		if (manager == 0)
+		{
 			identity = Identity::Manager;
 			signal(SIGUSR1, SIG_DFL);
-		} else {
+		}
+		else
+		{
 			identity = Identity::Boss;
 			signal(SIGUSR1, handleReloadSignalForBoss);
 
@@ -218,11 +312,14 @@ namespace ncserver
 					recordStatus(ReloadStatus_reloading);
 
 					pid_t newManager = fork();
-					if (newManager == 0) {
+					if (newManager == 0)
+					{
 						identity = Identity::Manager;
 						signal(SIGUSR1, SIG_DFL);
 						break;
-					} else {
+					}
+					else
+					{
 						identity = Identity::Boss;
 						while (!managerFinishedForking)
 						{
@@ -249,6 +346,8 @@ namespace ncserver
 #endif
 		if (identity == Identity::Boss)
 			return SUCCESS;
+
+		loadConfigFile();
 
 		if (!prepareProcess())
 		{
@@ -279,7 +378,8 @@ namespace ncserver
 			}
 			if (identity == Identity::Manager)
 			{
-				for (size_t i = 0; i < m_childCount; i++)
+				int workerCount = m_config->server.workerCount;
+				for (int i = 0; i < workerCount; i++)
 				{
 					kill(m_children[i], SIGTERM);
 					waitpid(m_children[i], NULL, 0);
@@ -365,10 +465,11 @@ namespace ncserver
 	void NcServer::reforkAllChildren()
 	{
 #ifndef WIN32
-		if (m_children == NULL)
+		if (m_children == nullptr)
 			return;
 
-		for (size_t i = 0; i < m_childCount; i++)
+		int workerCount = m_config->server.workerCount;
+		for (int i = 0; i < workerCount; i++)
 		{
 			pthread_mutex_lock(&m_mutex);
 			m_childrenStates[i] = CHILDSTATE_WAIT_FOR_RELOAD;
@@ -378,35 +479,7 @@ namespace ncserver
 	}
 
 #ifndef WIN32
-	NcServer::NcServer()
-	{
-		const char* childCountStr = getenv("childCount");
-		if (childCountStr == NULL)
-		{
-			m_childCount = 4;
-		}
-		else
-		{
-			int childCount = atoi(childCountStr);
-			m_childCount = childCount < 0 ? 4 : childCount;
-		}
-
-		m_children = new pid_t[m_childCount];
-		m_childrenStates = new ChildState[m_childCount];
-
-		memset(m_children, -1, sizeof(pid_t) * m_childCount);		// set as -1
-		memset(m_childrenStates, 0, sizeof(pid_t) * m_childCount);	// set as CHILDSTATE_INVALID
-
-		m_mutex = PTHREAD_MUTEX_INITIALIZER;
-		pthread_mutex_init(&m_mutex, NULL);
-	}
-
-	void NcServer::setChildCount(size_t childCount)
-	{
-		m_childCount = childCount;
-	}
-
-	bool NcServer::forkOne(size_t index)
+	bool NcServer::forkOne(int index)
 	{
 		pid_t pid = fork();
 		if (pid == 0)			// child
@@ -433,7 +506,8 @@ namespace ncserver
 
 	bool NcServer::forkChildren()
 	{
-		for (size_t i = 0; i < m_childCount; i++)
+		int workerCount = m_config->server.workerCount;
+		for (int i = 0; i < workerCount; i++)
 		{
 			if (!forkOne(i))
 				return false;
@@ -445,7 +519,8 @@ namespace ncserver
 	{
 		bool isManager = true;
 		std::vector<pid_t> childrenToKill;
-		for (size_t i = 0; i < m_childCount && isManager && !g_ncServerExit; i++)
+		int workerCount = m_config->server.workerCount;
+		for (int i = 0; i < workerCount && isManager && !g_ncServerExit; i++)
 		{
 			pid_t pidToKill = -1;
 			switch (m_childrenStates[i])

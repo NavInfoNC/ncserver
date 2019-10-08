@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sys, signal, time, stat 
+import os, sys, signal, time, stat
 import subprocess, psutil, argparse
 sys.dont_write_bytecode = True
 
@@ -57,14 +57,13 @@ def get_reload_status():
         status = int(f.read())
     return status
 
-def start_process(program_name, child_count):
+def start_process(program_name):
 
     if is_process_running(program_name):
         print("%s has already been running" % program_name)
         return 0
     
     try:
-        os.environ["childCount"] = child_count
         cmd = "spawn-fcgi -s %s -F 1 -P %s -M 0666 -b 4096 %s" % (g_sock_file, g_pid_file, program_name)
         subprocess.check_output(cmd, shell=True)
     except subprocess.CalledProcessError as e:
@@ -102,9 +101,9 @@ def stop_process(program_name, signal_num):
             os.remove(g_status_file)
         return 0
 
-def restart_process(program_name, child_count):
+def restart_process(program_name):
     if not stop_process(program_name, signal.SIGTERM):
-        if not start_process(program_name, child_count):
+        if not start_process(program_name):
             print("Succeeded in restarting %s" % program_name)
             return 0 
         else:
@@ -116,8 +115,7 @@ def restart_process(program_name, child_count):
 
 def reload_process(program_name):
     if not is_process_running(program_name):
-        child_count = os.getenv("childCount", default="4")
-        return start_process(program_name, child_count)
+        return start_process(program_name)
 
     with open(g_pid_file, "r") as f:
         pid = int(f.readline())
@@ -155,6 +153,28 @@ def program_status(program_name, verbosity):
         else:
             print(" ".join([str(p) for p in pids]))
 
+def reset_log_level(program_name, level):
+    procs = find_procs_by_name(program_name)
+    if len(procs) == 0:
+        print("%s has stopped" % program_name)
+    else:
+        if level == "debug":
+            send_signal(program_name, 35);
+        elif level == "info":
+            send_signal(program_name, 36);
+        elif level == "notice":
+            send_signal(program_name, 37);
+        elif level == "warning":
+            send_signal(program_name, 38);
+        elif level == "error":
+            send_signal(program_name, 39);
+        elif level == "crit":
+            send_signal(program_name, 40);
+        elif level == "alert":
+            send_signal(program_name, 41);
+        elif level == "emerg":
+            send_signal(program_name, 42);
+
 def run_tests(program_dir):
     test_script_path = "%s/test.py" % program_dir
     if not os.path.exists(test_script_path):
@@ -174,15 +194,15 @@ def main():
     parser = argparse.ArgumentParser(description="Management of Ncserver")
     subparsers = parser.add_subparsers(dest="subcommand_name")
     start_parser = subparsers.add_parser("start", help="start SERVER_NAME if it is not running")
-    start_parser.add_argument("-c", "--child-count", default="4", dest="child_count", help="Assign the worker processes' number to fork, default to 4")
     subparsers.add_parser("stop", help="stop SERVER_NAME if it is running")
     subparsers.add_parser("forcekill", help="terminate SERVER_NAME forcefully if it is running")
     restart_parser = subparsers.add_parser("restart", help="stop SERVER_NAME if it is running, then start it")
-    restart_parser.add_argument("-c", "--child-count", default="4", dest="child_count", help="Assign the worker processes' number to fork, default to 4")
     subparsers.add_parser("reload", help="reload SERVER_NAME if it is running, otherwise start it")
     status_parser = subparsers.add_parser("status", help="report SERVER_NAME's current status")
     status_parser.add_argument("-v", "--verbosity", action="store_true", help="increase the verbosity of output")
     subparsers.add_parser("test", help="run tests of SERVER_NAME")
+    log_parser = subparsers.add_parser("chloglvl", help="change the SERVER_NAME log level")
+    log_parser.add_argument("-l", "--level", default="error", dest="log_level", help="reset SERVER_NAME log level {debug,info,notice,warning,error,crit,alert,emerg}, default error")
     parser.add_argument("SERVER_NAME", help="module to be operated")
     parser.add_argument("-d", "--directory", default="/etc/ncserver", dest="server_dir", help="directory where SERVER_NAME resides, default to '/etc/ncserver'")
 
@@ -201,7 +221,7 @@ def main():
     program_name = "%s/%s" % (program_dir, server)
 
     if args.subcommand_name == "start":
-        return start_process(program_name, args.child_count)
+        return start_process(program_name)
     elif args.subcommand_name == "stop":
         return stop_process(program_name, signal.SIGTERM)
     elif args.subcommand_name == "forcekill":
@@ -209,7 +229,7 @@ def main():
     elif args.subcommand_name == "reload":
         return reload_process(program_name)
     elif args.subcommand_name == "restart":
-        return restart_process(program_name, args.child_count)
+        return restart_process(program_name)
     elif args.subcommand_name == "status":
         program_status(program_name, args.verbosity)
     elif args.subcommand_name == "test":
