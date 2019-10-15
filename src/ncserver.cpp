@@ -192,10 +192,10 @@ namespace ncserver
 #ifndef WIN32
 		m_children = nullptr;
 		m_childrenStates = nullptr;
-
 		m_mutex = PTHREAD_MUTEX_INITIALIZER;
 		pthread_mutex_init(&m_mutex, NULL);
 #endif
+		reset();
 	}
 
 	NcServer::~NcServer()
@@ -218,6 +218,9 @@ namespace ncserver
 
 		if (workerCount > 0)
 		{
+			delete[] m_children;
+			delete[] m_childrenStates;
+
 			m_children = new pid_t[workerCount];
 			m_childrenStates = new ChildState[workerCount];
 
