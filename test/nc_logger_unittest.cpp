@@ -23,6 +23,7 @@ public:
 	{
 		m_nclog->setDelegate(this);
 		m_lastMessage = copyStr("", 0);
+		m_lastRawMessage = copyStr("", 0);
 		m_lastLogLevel = copyStr("none", 4);
 	}
 
@@ -33,6 +34,7 @@ public:
 	}
 
 	const char* lastMessage() { return m_lastMessage; }
+	const char* lastRawMessage() { return m_lastRawMessage; }
 	const char* lastLogLevel() { return m_lastLogLevel; }
 
 	virtual void nclogWillOutputMessage(bool hasHeader, const char* message)
@@ -52,11 +54,14 @@ public:
 		}
 
 		free(m_lastMessage);
+		free(m_lastRawMessage); 
 		m_lastMessage = copyStr(text, strlen(text));
+		m_lastRawMessage = copyStr(message, strlen(message));
 	}
 
 protected:
 	char* m_lastMessage;
+	char* m_lastRawMessage;
 	char* m_lastLogLevel;
 	static NcLog* m_nclog;
 
@@ -75,6 +80,12 @@ TEST_F(NcLogTest, basic)
 {
 	ASYNC_LOG_ALERT("Hello %s", "world");
 	EXPECT_STREQ(lastMessage(), "Hello world");
+}
+
+TEST_F(NcLogTest, header)
+{
+	ASYNC_LOG_ALERT("Hello %s", "world");
+	EXPECT_STREQ(lastRawMessage(), "..\\test\\nc_logger_unittest.cpp(87): alert: [NcLogTest_header_Test::TestBody] Hello world");
 }
 
 TEST_F(NcLogTest, zeroParam)
@@ -98,10 +109,12 @@ TEST_F(NcLogTest, 10k)
 	char largeBuffer[1024 * 10];
 	memset(largeBuffer, 'a', sizeof(largeBuffer));
 	largeBuffer[sizeof(largeBuffer) - 1] = 0;
-	ASYNC_LOG_ALERT(largeBuffer);
+	ASYNC_LOG_ALERT("%s-%d",largeBuffer, 99);
 	EXPECT_TRUE(lastMessage()[0] == 'a');
 	EXPECT_TRUE(lastMessage()[sizeof(largeBuffer) - 2] == 'a');
-	EXPECT_EQ(strlen(lastMessage()), strlen(largeBuffer));
+	EXPECT_TRUE(lastMessage()[sizeof(largeBuffer) + 1] == '9');
+	EXPECT_TRUE(lastMessage()[sizeof(largeBuffer)] == '9');
+	EXPECT_EQ(strlen(lastMessage()), strlen(largeBuffer) + 3);
 }
 
 TEST_F(NcLogTest, 65k)
@@ -110,7 +123,7 @@ TEST_F(NcLogTest, 65k)
 	char largeBuffer[1024 * 65];
 	memset(largeBuffer, 'a', sizeof(largeBuffer));
 	largeBuffer[sizeof(largeBuffer) - 1] = 0;
-	ASYNC_LOG_ALERT(largeBuffer);
+	ASYNC_LOG_ALERT("%s-%d", largeBuffer, 99);
 	EXPECT_EQ(strlen(lastMessage()), 0);
 }
 

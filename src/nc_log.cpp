@@ -148,7 +148,7 @@ namespace ncserver
 #endif
 	}
 
-	void NcLog::_log(LogLevel logLevel, const char* header, size_t headerSize, const char* format, va_list argList)
+	void NcLog::_log(LogLevel logLevel, const char* header, size_t headerSize, const char* format, va_list vaList)
 	{
 		const static int MAX_MESSAGE_SIZE = 64 * 1024;
 
@@ -165,17 +165,19 @@ namespace ncserver
 			message = (char*)alloca(bufferSize + headerSize);
 			memcpy(message, header, headerSize);
 
+			va_list vaCopy;
+			va_copy(vaCopy, vaList);
 			int requiredSize;
 #if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
-			requiredSize = _vscprintf(format, argList) + 1;
+			requiredSize = _vscprintf(format, vaList) + 1;
 			if (requiredSize <= bufferSize)
 			{
-				vsnprintf(message + headerSize, bufferSize, format, argList);
+				vsnprintf(message + headerSize, bufferSize, format, vaCopy);
 			}
 #else
-			requiredSize = vsnprintf(message + headerSize, bufferSize, format, argList) + 1;
+			requiredSize = vsnprintf(message + headerSize, bufferSize, format, vaCopy) + 1;
 #endif
-
+			va_end(vaCopy);
 			if (requiredSize < 0)
 			{
 				failed = true;
