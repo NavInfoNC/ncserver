@@ -85,7 +85,8 @@ TEST_F(NcLogTest, basic)
 TEST_F(NcLogTest, header)
 {
 	ASYNC_LOG_ALERT("Hello %s", "world");
-	EXPECT_STREQ(lastRawMessage(), "..\\test\\nc_logger_unittest.cpp(87): alert: [NcLogTest_header_Test::TestBody] Hello world");
+	EXPECT_EQ(atoi(strstr(lastRawMessage(), "(")+1), 88);
+	EXPECT_TRUE(strstr(lastRawMessage(), "nc_logger_unittest.cpp(88)") != NULL);
 }
 
 TEST_F(NcLogTest, zeroParam)
