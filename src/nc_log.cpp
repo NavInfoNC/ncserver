@@ -169,7 +169,9 @@ namespace ncserver
 			va_copy(vaCopy, vaList);
 			int requiredSize;
 #if defined(WIN32) && _MSC_VER < 1900	// before visual studio 2015
-			requiredSize = _vscprintf(format, vaList) + 1;
+			requiredSize = _vscprintf(format, vaCopy) + 1;
+			va_end(vaCopy);
+			va_copy(vaCopy, vaList);
 			if (requiredSize <= bufferSize)
 			{
 				vsnprintf(message + headerSize, bufferSize, format, vaCopy);
