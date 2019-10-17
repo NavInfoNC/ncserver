@@ -2402,6 +2402,7 @@ static void StreamWideCharsToMessage(const wchar_t* wstr, size_t length,
 // ASSERT/EXPECT in a procedure adds over 200 bytes to the procedure's
 // stack frame leading to huge stack frames in some cases; gcc does not reuse
 // the stack space.
+
 Message::Message() : ss_(new ::std::stringstream) {
   // By default, we want there to be enough precision when printing
   // a double to a Message.

@@ -23,7 +23,6 @@ public:
 	{
 		m_nclog->setDelegate(this);
 		m_lastMessage = copyStr("", 0);
-		m_lastLogLevel = copyStr("none", 4);
 		m_fileModule = copyStr("", 0);
 		m_levelModule = copyStr("", 0);
 		m_functionModule = copyStr("", 0);
@@ -32,14 +31,12 @@ public:
 	void TearDown()
 	{
 		free(m_lastMessage);
-		free(m_lastLogLevel);
 		free(m_fileModule);
 		free(m_levelModule);
 		free(m_functionModule);
 	}
 
 	const char* lastMessage() { return m_lastMessage; }
-	const char* lastLogLevel() { return m_lastLogLevel; }
 	const char* fileModule() { return m_fileModule; }
 	const char* levelModule() { return m_levelModule; }
 	const char* functionModule() { return m_functionModule; }
@@ -50,15 +47,14 @@ public:
 		if (hasHeader)
 		{
 			text = strchr(message, ']') + 2; // skip file, lineno, func name
-			const char* logLevel = strchr(message, ':') + 2;
-			const char* endOfLogLevel = strchr(logLevel, ':');
-			m_lastLogLevel = copyStr(logLevel, endOfLogLevel - logLevel);
+			freeModuleName();
 			parsingModuleName(message);
 		}
 		else
 		{
 			text = message;
-			m_lastLogLevel = copyStr("none", 4);
+			freeModuleName();
+			initModuleName();
 		}
 
 		free(m_lastMessage);
@@ -67,7 +63,6 @@ public:
 
 protected:
 	char* m_lastMessage;
-	char* m_lastLogLevel;
 	char* m_fileModule;
 	char* m_levelModule;
 	char* m_functionModule;
@@ -97,6 +92,20 @@ protected:
 		long long len3 = p5 - p4 - 1;
 		m_functionModule = copyStr(p3 + 3, len3);
 	}
+
+	void initModuleName()
+	{
+		m_fileModule = copyStr("", 0);
+		m_levelModule = copyStr("", 0);
+		m_functionModule = copyStr("", 0);
+	}
+
+	void freeModuleName()
+	{
+		free(m_fileModule);
+		free(m_levelModule);
+		free(m_functionModule);
+	}
 };
 
 NcLog* NcLogTest::m_nclog = NULL;
@@ -111,7 +120,7 @@ TEST_F(NcLogTest, header)
 {
 	ASYNC_LOG_ALERT("Hello %s", "world");
 	EXPECT_TRUE(strstr(fileModule(), "nc_logger_unittest.cpp") != NULL);
-	EXPECT_STREQ(levelModule(), lastLogLevel());
+	EXPECT_STREQ(levelModule(), "alert");
 	EXPECT_TRUE(strstr(functionModule(), "TestBody") != NULL);
 }
 
@@ -162,18 +171,18 @@ TEST_F(NcLogTest, logLevel)
 	EXPECT_EQ(NcLog::instance().logLevel(), LogLevel_notice);
 	ASYNC_LOG_NOTICE("notice 1");
 	EXPECT_STREQ(lastMessage(), "notice 1");
-	EXPECT_STREQ(lastLogLevel(), LogLevel_toString(LogLevel_notice));
+	EXPECT_STREQ(levelModule(), LogLevel_toString(LogLevel_notice));
 
 	NcLog::instance().setLogLevel(LogLevel_warning);
 	EXPECT_EQ(NcLog::instance().logLevel(), LogLevel_warning);
 	ASYNC_LOG_NOTICE("notice 2");
 	ASYNC_LOG_INFO("info");
 	EXPECT_STREQ(lastMessage(), "notice 1");
-	EXPECT_STREQ(lastLogLevel(), LogLevel_toString(LogLevel_notice));
+	EXPECT_STREQ(levelModule(), LogLevel_toString(LogLevel_notice));;
 
 	ASYNC_RAW_LOG("raw");
 	EXPECT_STREQ(lastMessage(), "raw");
-	EXPECT_STREQ(lastLogLevel(), "none");
+	EXPECT_STREQ(levelModule(), "");
 
 	NcLog::instance().setLogLevel(originalLevel);
 }
