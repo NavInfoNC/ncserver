@@ -63,6 +63,9 @@ protected:
 	char* m_lastMessage;
 	char* m_lastRawMessage;
 	char* m_lastLogLevel;
+	char* m_file;
+	char* m_level;
+	char* m_function;
 	static NcLog* m_nclog;
 
 	char* copyStr(const char* str, size_t len)
@@ -71,6 +74,30 @@ protected:
 		memcpy(newCopy, str, len);
 		newCopy[len] = '\0';
 		return newCopy;
+	}
+
+	void parsingModuleName(const char* rawMessage)
+	{
+		const char* p1 = strchr(rawMessage, '(');
+		long long len1 = p1 - rawMessage;
+		m_file = copyStr(rawMessage, len1);
+
+		const char* p2 = strchr(p1, ':');
+		const char* p3 = strchr(p2 + 1, ':');
+		long long len2 = p3 - p2 - 2;
+		m_level = copyStr(p2 + 2, len2);
+
+		const char* p4 = strchr(p3, '[');
+		const char* p5 = strchr(p4 + 1, ']');
+		long long len3 = p5 - p4 - 1;
+		m_function = copyStr(p3 + 3, len3);
+	}
+
+	void freeModuleName()
+	{
+		free(m_file);
+		free(m_level);
+		free(m_function);
 	}
 };
 
@@ -85,8 +112,11 @@ TEST_F(NcLogTest, basic)
 TEST_F(NcLogTest, header)
 {
 	ASYNC_LOG_ALERT("Hello %s", "world");
-	EXPECT_EQ(atoi(strstr(lastRawMessage(), "(")+1), 87);
-	EXPECT_TRUE(strstr(lastRawMessage(), "nc_logger_unittest.cpp(87)") != NULL);
+	parsingModuleName(lastRawMessage());
+	EXPECT_TRUE(strstr(m_file, "nc_logger_unittest.cpp") != NULL);
+	EXPECT_STREQ(m_level, m_lastLogLevel);
+	EXPECT_TRUE(strstr(m_function, "TestBody") != NULL);
+	freeModuleName();
 }
 
 TEST_F(NcLogTest, zeroParam)
