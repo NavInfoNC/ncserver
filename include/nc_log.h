@@ -102,8 +102,14 @@ namespace ncserver
 		*/
 		void init(const char* serverName, LogLevel logLevel);
 
+		/*
+			@note Log size limit is 64k
+		*/
 		void log(LogLevel level, const char* file, int line, const char* func, const char *format, ...);
 
+		/*
+			@note Log size limit is 64k
+		*/
 		void rawLog(const char *format, ...);
 
 		// default = LogLevel_error
@@ -136,11 +142,11 @@ namespace ncserver
 	ncserver::NcLog::instance().log(logLevel, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__); \
 	} while (0)
 
-#define ASYNC_LOG_DEBUG(fmt, ...) ASYNC_LOG(ncserver::LogLevel_debug, fmt, ##__VA_ARGS__)
-#define ASYNC_LOG_INFO(fmt, ...) ASYNC_LOG(ncserver::LogLevel_info, fmt, ##__VA_ARGS__)
-#define ASYNC_LOG_NOTICE(fmt, ...) ASYNC_LOG(ncserver::LogLevel_notice, fmt, ##__VA_ARGS__)
+#define ASYNC_LOG_DEBUG(fmt, ...)	ASYNC_LOG(ncserver::LogLevel_debug, fmt, ##__VA_ARGS__)
+#define ASYNC_LOG_INFO(fmt, ...)	ASYNC_LOG(ncserver::LogLevel_info, fmt, ##__VA_ARGS__)
+#define ASYNC_LOG_NOTICE(fmt, ...)	ASYNC_LOG(ncserver::LogLevel_notice, fmt, ##__VA_ARGS__)
 #define ASYNC_LOG_WARNING(fmt, ...) ASYNC_LOG(ncserver::LogLevel_warning, fmt, ##__VA_ARGS__)
-#define ASYNC_LOG_ERR(fmt, ...) ASYNC_LOG(ncserver::LogLevel_error, fmt, ##__VA_ARGS__)
-#define ASYNC_LOG_CRIT(fmt, ...) ASYNC_LOG(ncserver::LogLevel_crit, fmt, ##__VA_ARGS__)
-#define ASYNC_LOG_ALERT(fmt, ...) ASYNC_LOG(ncserver::LogLevel_alert, fmt, ##__VA_ARGS__)
-#define ASYNC_LOG_EMERG(fmt, ...) ASYNC_LOG(ncserver::LogLevel_emerg, fmt, ##__VA_ARGS__)
+#define ASYNC_LOG_ERR(fmt, ...)		ASYNC_LOG(ncserver::LogLevel_error, fmt, ##__VA_ARGS__)
+#define ASYNC_LOG_CRIT(fmt, ...)	ASYNC_LOG(ncserver::LogLevel_crit, fmt, ##__VA_ARGS__)
+#define ASYNC_LOG_ALERT(fmt, ...)	ASYNC_LOG(ncserver::LogLevel_alert, fmt, ##__VA_ARGS__)
+#define ASYNC_LOG_EMERG(fmt, ...)	ASYNC_LOG(ncserver::LogLevel_emerg, fmt, ##__VA_ARGS__)
