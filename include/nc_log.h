@@ -102,8 +102,14 @@ namespace ncserver
 		*/
 		void init(const char* serverName, LogLevel logLevel);
 
+		/*
+			@note Log size limit is 64k
+		*/
 		void log(LogLevel level, const char* file, int line, const char* func, const char *format, ...);
 
+		/*
+			@note Log size limit is 64k
+		*/
 		void rawLog(const char *format, ...);
 
 		// default = LogLevel_error
@@ -117,9 +123,6 @@ namespace ncserver
 		~NcLog();
 
 		void write(LogLevel logLevel, const char *format, ...);
-		/*
-			@note Log size limit is 64k
-		*/
 		void _log(LogLevel logLevel, const char* header, size_t headerSize, const char* format, va_list argList);
 
 		LogLevel m_logLevel;
