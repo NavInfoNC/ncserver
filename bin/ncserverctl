@@ -234,6 +234,8 @@ def main():
         program_status(program_name, args.verbosity)
     elif args.subcommand_name == "test":
         run_tests(program_dir)
+    elif args.subcommand_name == "chloglvl":
+        reset_log_level(program_name, args.log_level)
 
 if __name__ == "__main__":
     sys.exit(main())
