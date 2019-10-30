@@ -137,24 +137,24 @@ void StaticStringMap::clear() {
 
 //////////////////////////////////////////////////////////////////////////
 
-struct StaticStringMapIteratorImple : public RequestParameteterIterator
+struct StaticStringMapIteratorImple : public RequestParameterIterator
 {
 	Map::const_iterator m_i, m_begin, m_end;
 };
 
-RequestParameteterIterator* RequestParameteterIterator_alloc()
+RequestParameterIterator* RequestParameterIterator_alloc()
 {
 	StaticStringMapIteratorImple* o = new StaticStringMapIteratorImple;
 	return o;
 }
 
-void RequestParameteterIterator_free(RequestParameteterIterator* o)
+void RequestParameterIterator_free(RequestParameterIterator* o)
 {
 	StaticStringMapIteratorImple* p = (StaticStringMapIteratorImple*)o;
 	delete p;
 }
 
-bool RequestParameteterIterator::next()
+bool RequestParameterIterator::next()
 {
 	StaticStringMapIteratorImple* o = (StaticStringMapIteratorImple*)this;
 	if (o->m_i == o->m_end)
@@ -166,7 +166,7 @@ bool RequestParameteterIterator::next()
 	return true;
 }
 
-void RequestParameteterIterator::_init(StaticStringMap* map_)
+void RequestParameterIterator::_init(StaticStringMap* map_)
 {
 	StaticStringMapIteratorImple* o = (StaticStringMapIteratorImple*)this;
 	StaticStringMapImple* map = (StaticStringMapImple*)map_;
@@ -174,7 +174,7 @@ void RequestParameteterIterator::_init(StaticStringMap* map_)
 	o->m_end = map->m_map.end();
 }
 
-void RequestParameteterIterator::reset()
+void RequestParameterIterator::reset()
 {
 	StaticStringMapIteratorImple* o = (StaticStringMapIteratorImple*)this;
 	o->m_i = o->m_begin;

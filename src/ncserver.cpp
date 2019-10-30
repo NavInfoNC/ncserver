@@ -71,7 +71,7 @@ namespace ncserver
 	Request::Request()
 	{
 		m_params = StaticStringMap_alloc();
-		m_paramIter = RequestParameteterIterator_alloc();
+		m_paramIter = RequestParameterIterator_alloc();
 		m_paramPool[0] = 0;
 	}
 
@@ -129,7 +129,7 @@ namespace ncserver
 		return param;
 	}
 
-	RequestParameteterIterator* Request::getParameterIterator()
+	RequestParameterIterator* Request::getParameterIterator()
 	{
 		return m_paramIter;
 	}

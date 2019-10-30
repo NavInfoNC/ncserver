@@ -33,7 +33,7 @@ struct StaticStringMap
 StaticStringMap* StaticStringMap_alloc();
 void StaticStringMap_free(StaticStringMap* o);
 
-struct RequestParameteterIterator
+struct RequestParameterIterator
 {
 	const char* name;
 	const char* value;
@@ -44,8 +44,8 @@ struct RequestParameteterIterator
 	void reset();
 };
 
-RequestParameteterIterator* RequestParameteterIterator_alloc();
-void RequestParameteterIterator_free(RequestParameteterIterator* o);
+RequestParameterIterator* RequestParameterIterator_alloc();
+void RequestParameterIterator_free(RequestParameterIterator* o);
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -161,13 +161,13 @@ namespace ncserver
 
 		void reset(const char* queryString);
 
-		RequestParameteterIterator* getParameterIterator();
+		RequestParameterIterator* getParameterIterator();
 
 	private:
 		char m_paramPool[URL_MAX_LENGTH];
 		char m_queryString[URL_MAX_LENGTH];
 		StaticStringMap* m_params;
-		RequestParameteterIterator* m_paramIter;
+		RequestParameterIterator* m_paramIter;
 	};
 
 	class NcServer
