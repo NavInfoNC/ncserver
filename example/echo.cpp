@@ -21,7 +21,7 @@ protected:
 		// parse and output query string
 		io->print("Query String: %s\n", request->queryString());
 		ASYNC_LOG_INFO("Query String: %s", request->queryString());
-		RequestParameteterIterator* iter = request->getParameterIterator();
+		RequestParameterIterator* iter = request->getParameterIterator();
 		while (iter->next())
 		{
 			io->print("%s: %s\n", iter->name, iter->value);
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 	NcLog::instance().registerUpdateLogLevelSignal();
 	NcLog::instance().init("echo", LogLevel_info);
 	EchoServer server;
-	server.runAndFork(9009);	// 9009 is only used on Windows. 
+	server.runAndFork(9009);	// 9009 is only used on Windows.
 								// When running under Linux, Unix Domain Socket is used instead.
 	return 0;
 }
