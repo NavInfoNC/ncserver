@@ -11,6 +11,11 @@ import imp # local local test suite
 g_pid_file = ".pid"
 g_status_file = ".status"
 g_sock_file = ".ncserver.sock"
+
+# if the server is running in a k8s pod
+if os.path.isfile("/var/run/secrets/kubernetes.io/serviceaccount/namespace"):
+    g_sock_file = "sock/.ncserver.sock"
+
 g_signal_num_2_name = dict((getattr(signal, n), n) \
     for n in dir(signal) if n.startswith('SIG') and '_' not in n )
 
