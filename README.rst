@@ -130,20 +130,20 @@ Compile & test steps under Windows
             include        fastcgi_params;
          }
 
-   .. note:: ncserver communicate with nginx with FCGI protocol. The commmunication can either be built via TCP or Unix Domain Socket.
-      In this case, since we are under Windows platform, TCP becomes our only choice, and we chose 9009 port for example.
-      In the case below where we introduces configuration under Linux, Unix Domain Socket will be used.
+.. note:: ncserver communicate with nginx with FCGI protocol. The commmunication can either be built via TCP or Unix Domain Socket.
+   In this case, since we are under Windows platform, TCP becomes our only choice, and we chose 9009 port for example.
+   In the case below where we introduces configuration under Linux, Unix Domain Socket will be used.
 
 2. Double click dependency/nginx-1.7.2/nginx.exe to start nginx.
 
-   .. notice:: 
-      Nginx would run in background. 
-      If you modify the configuration of nginx and want the new configuration to take effect, you should use the ``nginx -s reload`` command.
-      If you want to stop nginx, you can either use ``nginx -s stop`` command or directly kill the nginx processes in Task Manager.
+.. note:: 
+   Nginx would run in background. 
+   If you modify the configuration of nginx and want the new configuration to take effect, you should use the ``nginx -s reload`` command.
+   If you want to stop nginx, you can either use ``nginx -s stop`` command or directly kill the nginx processes in Task Manager.
 
-   .. warning:: 
-      If you double click nginx more than once, ``nginx -s stop`` command can only be used to stop the nginx processes you started by the last double click.
-      Other processes can only be killed in Task Manager.
+.. warning:: 
+   If you double click nginx more than once, ``nginx -s stop`` command can only be used to stop the nginx processes you started by the last double click.
+   Other processes can only be killed in Task Manager.         
 
 3. Double click config/ncserver.sln, compile it in Visual Studio, and then run the example project.
 4. Run example/test.py, or directly access http://127.0.0.1/echo?text=abc in browser to test the project.
