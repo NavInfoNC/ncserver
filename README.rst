@@ -115,12 +115,12 @@ Build and Test
   But we think Visual Studio is indispensable for any productive-minded C++ developer.
   So we finish most of the work on Windows and only compile and deploy service on Linux.
 
-Window下编译&测试
-^^^^^^^^^^^^^^^^^
+Compile & test steps under Windows
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-按照以下步骤编译和测试。
+1. Configure dependency/nginx-1.7.2/conf/nginx.conf to make nginx a FastCGI proxy and transfer requests via TCP connection to our backend.
 
-1. 配置dependency/nginx-1.7.2/conf/nginx.conf::
+.. code-block:: bash
 
       location ~ /echo {
             root           html;
@@ -130,20 +130,29 @@ Window下编译&测试
             include        fastcgi_params;
          }
 
-   .. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
-      本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
+   .. note:: ncserver communicate with nginx with FCGI protocol. The commmunication can either be built via TCP or Unix Domain Socket.
+      In this case, since we are under Windows platform, TCP becomes our only choice, and we chose 9009 port for example.
+      In the case below where we introduces configuration under Linux, Unix Domain Socket will be used.
 
-2. 启动dependency/nginx-1.7.2/nginx.exe。
+2. Double click dependency/nginx-1.7.2/nginx.exe to start nginx.
 
-   .. warning:: nginx.exe只能双击一次，否则会出现问题。必须用nginx -s stop停止。用nginx -s reload重新加载配置。
+   .. notice:: 
+      Nginx would run in background. 
+      If you modify the configuration of nginx and want the new configuration to take effect, you should use the ``nginx -s reload`` command.
+      If you want to stop nginx, you can either use ``nginx -s stop`` command or directly kill the nginx processes in Task Manager.
 
-3. 直接打开config的sln文件。编译。按F5运行example。
-4. 运行test.py。或者直接访问http://127.0.0.1/echo?text=abc
+   .. warning:: 
+      If you double click nginx more than once, ``nginx -s stop`` command can only be used to stop the nginx processes you started by the last double click.
+      Other processes can only be killed in Task Manager.
 
-Ubuntu下编译&测试
-^^^^^^^^^^^^^^^^^
+3. Double click config/ncserver.sln, compile it in Visual Studio, and then run the example project.
+4. Run example/test.py, or directly access http://127.0.0.1/echo?text=abc in browser to test the project.
 
-首先，配置nginx。让 Nginx 把请求转发给 Unix Domain Socket。
+Compile & test steps under Linux
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Install nginx using apt-get or yum (depend on your system). 
+2. Configure nginx as a fastcgi proxy to transfer requests to our backend via Unix Domain Socket。
 
 .. code-block:: bash
 
@@ -157,9 +166,9 @@ Ubuntu下编译&测试
       include        fastcgi_params;
    }
 
-   $ sudo nginx -s reload
+   $ sudo nginx -s reload(or sudo nginx -s start, if nginx is not started yet.)
 
-运行以下命令，编译ncserver的lib和测试程序echo。
+3. Run the following commands to compile ncserver library and the testing program.
 
 .. code-block:: bash
 
@@ -169,6 +178,11 @@ Ubuntu下编译&测试
    $ ncserverctl start echo
    Starting <echo> on domain socket unix:/etc/ncserver/echo/.ncserver.sock
    spawn-fcgi: child spawned successfully: PID: 32592
+
+4. Use curl to test the echo server.
+
+.. code-block:: bash
+
    $ curl  "http://127.0.0.1/echo?city=beijing&keyword=coffee"
    Request-Method: GET
    Query String: city=beijing&keyword=coffee
