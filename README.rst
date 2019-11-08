@@ -8,6 +8,43 @@ In NavInfo, all our navigation related services(routing, poi searching, traffic 
 
 .. image:: docs/architecture.png
 
+Background Introduction
+-----------------------
+
+**ncserver** is developed based on `fastcgi lib<http://fastcgi.com/>`__.
+
+FastCGI is a common gateway interface which is already supported in so many web servers, nginx for example.
+Any backend server program speaking FastCGI can communicate with web servers, and therefore can process HTTP requests easily.
+With the help of FastCGI, we are able to develop C/C++ web applications, leaving more technical details to the web servers,
+and we can then just focus on business logics.
+
+However, FastCGI was originaly designed to be compatible with CGI and therefore its intefaces are not handy enough.
+And that is the exact reason we develop **ncserver** to make web application development easier.
+
+The main purposes of NcServer are:
+
+#. to hide FastCGI details, provide more handy interfaces;
+#. to provide a common web application framework and life cycle managing abilility;
+#. to support user-controllable process spawning;
+#. to provide a robust architecture.
+
+
+ncserver是基于fastCGI二次开发的。
+FastCGI是一个支持C语言开发的通用网关接口，通过FastCGI，我们可以直接用C/C++语言开发服务器程序，运行效率高。
+然而FastCGI的接口为了兼容普通CGI。导致接口使用并不非常直观。所以我们进行了二次封装。
+
+NcServer的设计目的为：
+
+* 封装FastCGI。
+* 提供程序的生命周期框架。
+* 提供fork()支持。允许快速复制出服务进程。
+  
+关于fork()支持。是为了适应导航在线服务的特点而设计。因为算路、搜索等服务，都是基于大量静态数据进行的。
+如果多个fcgi进行都去加载大量同样的数据，会浪费许多内存。
+
+所以，可以先由一个进程把静态数据加载完毕之后，再fork()出其它服务进程。
+基于Linux操作系统的COW特性，就可以成倍减少内存占用。
+
 A Simple Example
 ----------------
 
@@ -183,7 +220,7 @@ Compile & test steps under Linux
 
 .. code-block:: bash
 
-   $ curl  "http://127.0.0.1/echo?city=beijing&keyword=coffee"
+   $ curl "http://127.0.0.1/echo?city=beijing&keyword=coffee"
    Request-Method: GET
    Query String: city=beijing&keyword=coffee
    city: beijing
@@ -195,25 +232,6 @@ ncserverctl
 `ncserverctl` is the managment program for ncserver services. It's used to start/stop/restart/reload a service.
 
 .. warning:: Needs docmentation
-
-项目背景
---------
-
-ncserver是基于fastCGI二次开发的。
-FastCGI是一个支持C语言开发的通用网关接口，通过FastCGI，我们可以直接用C/C++语言开发服务器程序，运行效率高。
-然而FastCGI的接口为了兼容普通CGI。导致接口使用并不非常直观。所以我们进行了二次封装。
-
-NcServer的设计目的为：
-
-* 封装FastCGI。
-* 提供程序的生命周期框架。
-* 提供fork()支持。允许快速复制出服务进程。
-  
-关于fork()支持。是为了适应导航在线服务的特点而设计。因为算路、搜索等服务，都是基于大量静态数据进行的。
-如果多个fcgi进行都去加载大量同样的数据，会浪费许多内存。
-
-所以，可以先由一个进程把静态数据加载完毕之后，再fork()出其它服务进程。
-基于Linux操作系统的COW特性，就可以成倍减少内存占用。
 
 Troubleshoot
 ------------
