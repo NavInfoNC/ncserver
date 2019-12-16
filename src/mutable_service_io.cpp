@@ -22,20 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include "stdafx.h"
-
+#include <cstdarg>
 #include "mutable_service_io.h"
-#include "nc_log.h"
-
-#ifndef WIN32
-#include <sys/wait.h>
-#include <sys/mman.h>
-#include <thread>
-#include <vector>
-#endif
 
 namespace ncserver
 {
-	static char* copyStr(const char* str, size_t len)
+	static char* _copyStr(const char* str, size_t len)
 	{
 		char* newCopy = (char*)malloc(len + 1);
 		memcpy(newCopy, str, len);
@@ -45,8 +37,8 @@ namespace ncserver
 
 	MutableServiceIo::MutableServiceIo()
 	{
-		m_postData = copyStr("", 0);
-		m_buffer = copyStr("", 0);
+		m_postData = _copyStr("", 0);
+		m_buffer = _copyStr("", 0);
 		m_bufferSize = 0;
 	}
 
@@ -126,7 +118,7 @@ namespace ncserver
 	void MutableServiceIo::setPostData(void* postData, size_t size)
 	{
 		free(m_postData);
-		m_postData = copyStr((char*)postData, size);
+		m_postData = _copyStr((char*)postData, size);
 	}
 
 }

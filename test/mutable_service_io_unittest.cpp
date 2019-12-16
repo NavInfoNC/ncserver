@@ -34,10 +34,10 @@ TEST(MutableServiceIo, print)
 TEST(MutableServiceIo, headerField)
 {
 	MutableServiceIo io;
-	const char* result = "Content-type: application/json\r\n{\"io\":\"MutableServiceIo\"}\r\n";
+	const char* result = "Content-type: application/json\r\n\r\n{\"io\":\"MutableServiceIo\"}";
 	const char* buffer = "{\"io\":\"MutableServiceIo\"}";
 	io.addHeaderField("Content-type: application/json");
-	io.write((void*)buffer, strlen(buffer));
 	io.endHeaderField();
+	io.write((void*)buffer, strlen(buffer));
 	EXPECT_EQ(strncmp((char*)io.buffer(), result, strlen(result)), 0);
 }
