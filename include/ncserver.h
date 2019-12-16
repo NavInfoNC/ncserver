@@ -189,7 +189,7 @@ namespace ncserver
 		bool isGet();
 		bool isPost();
 
-		void reset(const char* queryString);
+		void setQueryString(const char* queryString);
 
 		RequestParameterIterator* getParameterIterator();
 

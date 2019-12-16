@@ -1,0 +1,42 @@
+#include "stdafx.h"
+#include "ncserver.h"
+#include "gtest.h"
+
+using namespace ncserver;
+
+TEST(MutableServiceIo, read)
+{
+	MutableServiceIo io;
+	const char* postData = "{\"io\":\"MutableServiceIo\"}";
+	io.setPostData((void*)postData, strlen(postData));
+	char* buffer = (char*)malloc(strlen(postData));
+	io.read(buffer, strlen(postData));
+	EXPECT_EQ(strncmp(buffer, postData, strlen(postData)), 0);
+}
+
+TEST(MutableServiceIo, write)
+{
+	MutableServiceIo io;
+	const char* result = "{\"io\":\"MutableServiceIo\"}";
+	io.write((void*)result, strlen(result));
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, strlen(result)), 0);
+}
+
+TEST(MutableServiceIo, print)
+{
+	MutableServiceIo io;
+	const char* result = "{\"io\":\"MutableServiceIo\"}";
+	io.print("{\"%s\":\"%s\"}", "io", "MutableServiceIo");
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, strlen(result)), 0);
+}
+
+TEST(MutableServiceIo, headerField)
+{
+	MutableServiceIo io;
+	const char* result = "Content-type: application/json\r\n{\"io\":\"MutableServiceIo\"}\r\n";
+	const char* buffer = "{\"io\":\"MutableServiceIo\"}";
+	io.addHeaderField("Content-type: application/json");
+	io.write((void*)buffer, strlen(buffer));
+	io.endHeaderField();
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, strlen(result)), 0);
+}

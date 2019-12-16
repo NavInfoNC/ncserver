@@ -134,7 +134,7 @@ namespace ncserver
 		return m_paramIter;
 	}
 
-	void Request::reset(const char* urlValue)
+	void Request::setQueryString(const char* urlValue)
 	{
 		m_params->clear();
 		m_paramPool[0] = 0;
@@ -447,7 +447,7 @@ namespace ncserver
 				continue;
 			}
 
-			request.reset(qs);
+			request.setQueryString(qs);
 
 			query(io, &request);
 		}
