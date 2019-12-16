@@ -31,6 +31,7 @@ target_link_libraries(${PROJ_NAME}
 	rt
 	dl
 	ncserver
+	pthread
 	dl
 	rt
 	m
