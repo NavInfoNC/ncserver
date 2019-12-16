@@ -66,36 +66,6 @@ namespace ncserver
 		virtual void flush(void) = 0;
 	};
 
-	class MutableServiceIo : public ServiceIo
-	{
-	public:
-		MutableServiceIo();
-
-		virtual ~MutableServiceIo();
-
-		virtual void read(void *buffer, size_t size);
-
-		virtual void write(void* buffer, size_t size);
-
-		virtual int print(const char* format, ...);
-
-		virtual int addHeaderField(const char* format, ...);
-
-		virtual void endHeaderField(void);
-
-		virtual void flush(void);
-
-		void setPostData(void* postData, size_t size);
-
-		void* buffer() { return m_buffer; }
-		size_t bufferSize() { return m_bufferSize; }
-
-	private:
-		void* m_postData;
-		void* m_buffer;
-		size_t m_bufferSize;
-	};
-
 	enum ServerState
 	{
 		SUCCESS,

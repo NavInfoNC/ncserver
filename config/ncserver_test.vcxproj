@@ -172,6 +172,7 @@
     <ClInclude Include="..\3rd-party\yaml-cpp\src\tag.h" />
     <ClInclude Include="..\3rd-party\yaml-cpp\src\token.h" />
     <ClInclude Include="..\gtest\gtest.h" />
+    <ClInclude Include="..\include\mutable_service_io.h" />
     <ClInclude Include="..\include\ncserver.h" />
     <ClInclude Include="..\include\nc_log.h" />
     <ClInclude Include="..\src\fcgi_bind.h" />
@@ -338,6 +339,7 @@
     </ClCompile>
     <ClCompile Include="..\src\fcgi_bind.cpp" />
     <ClCompile Include="..\src\fcgi_service_io.cpp" />
+    <ClCompile Include="..\src\mutable_service_io.cpp" />
     <ClCompile Include="..\src\ncserver.cpp" />
     <ClCompile Include="..\src\nc_log.cpp" />
     <ClCompile Include="..\src\static_string_map.cpp" />
