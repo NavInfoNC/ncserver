@@ -95,7 +95,7 @@ namespace ncserver
 			m_buffer = realloc(m_buffer, m_bufferSize + cnt + 2);
 			memcpy((char*)m_buffer + m_bufferSize, buffer, cnt);
 			m_bufferSize += cnt;
-			memcpy((char*)m_buffer + strlen((char*)buffer), "\r\n", 2);
+			memcpy((char*)m_buffer + m_bufferSize, "\r\n", 2);
 			m_bufferSize += 2;
 		}
 
