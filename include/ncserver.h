@@ -71,7 +71,7 @@ namespace ncserver
 	public:
 		MutableServiceIo();
 
-		~MutableServiceIo();
+		virtual ~MutableServiceIo();
 
 		virtual void read(void *buffer, size_t size);
 
