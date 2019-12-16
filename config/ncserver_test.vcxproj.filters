@@ -393,6 +393,9 @@
     <ClCompile Include="..\3rd-party\yaml-cpp\src\tag.cpp">
       <Filter>3rd-party\yaml-cpp\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\mutable_service_io_unittest.cpp">
+      <Filter>test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ReadMe.rst" />

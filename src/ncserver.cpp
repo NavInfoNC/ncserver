@@ -597,9 +597,9 @@ namespace ncserver
 
 	void MutableServiceIo::write(void* buffer, size_t size)
 	{
-		free(m_buffer);
-		m_buffer = copyStr((char*)buffer, size);
-		m_bufferSize = size;
+		m_buffer = realloc(m_buffer, m_bufferSize + size);
+		memcpy((char*)m_buffer + m_bufferSize, buffer, size);
+		m_bufferSize += size;
 	}
 
 	int MutableServiceIo::print(const char* format, ...)
@@ -614,7 +614,9 @@ namespace ncserver
 
 		if (count >= 0)
 		{
-			printf("%s", buffer);
+			m_buffer = realloc(m_buffer, m_bufferSize + count);
+			memcpy((char*)m_buffer + m_bufferSize, buffer, count);
+			m_bufferSize += count;
 		}
 
 		return count;
@@ -632,7 +634,11 @@ namespace ncserver
 
 		if (cnt >= 0)
 		{
-			printf("%s\r\n", buffer);
+			m_buffer = realloc(m_buffer, m_bufferSize + cnt + 2);
+			memcpy((char*)m_buffer + m_bufferSize, buffer, cnt);
+			m_bufferSize += cnt;
+			memcpy((char*)m_buffer + strlen((char*)buffer), "\r\n", 2);
+			m_bufferSize += 2;
 		}
 
 		return cnt;
@@ -640,7 +646,9 @@ namespace ncserver
 
 	void MutableServiceIo::endHeaderField(void)
 	{
-		printf("\r\n");
+		m_buffer = realloc(m_buffer, m_bufferSize + 2);
+		memcpy((char*)m_buffer + m_bufferSize, "\r\n", 2);
+		m_bufferSize += 2;
 		return;
 	}
 

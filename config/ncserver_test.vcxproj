@@ -346,6 +346,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\test\main.cpp" />
+    <ClCompile Include="..\test\mutable_service_io_unittest.cpp" />
     <ClCompile Include="..\test\nc_logger_unittest.cpp" />
     <ClCompile Include="..\test\request_unittest.cpp" />
     <ClCompile Include="..\test\stdafx.cpp">
