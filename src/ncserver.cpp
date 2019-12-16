@@ -568,4 +568,91 @@ namespace ncserver
 	}
 
 #endif
+
+	char* copyStr(const char* str, size_t len)
+	{
+		char* newCopy = (char*)malloc(len + 1);
+		memcpy(newCopy, str, len);
+		newCopy[len] = '\0';
+		return newCopy;
+	}
+
+	MutableServiceIo::MutableServiceIo()
+	{
+		m_postData = copyStr("", 0);
+		m_buffer = copyStr("", 0);
+		m_bufferSize = 0;
+	}
+
+	MutableServiceIo::~MutableServiceIo()
+	{
+		free(m_buffer);
+		free(m_postData);
+	}
+
+	void MutableServiceIo::read(void *buffer, size_t size)
+	{
+		memcpy(buffer, m_postData, size);;
+	}
+
+	void MutableServiceIo::write(void* buffer, size_t size)
+	{
+		free(m_buffer);
+		m_buffer = copyStr((char*)buffer, size);
+		m_bufferSize = size;
+	}
+
+	int MutableServiceIo::print(const char* format, ...)
+	{
+		int count;
+		char buffer[8192];
+		va_list argptr;
+
+		va_start(argptr, format);
+		count = vsnprintf(buffer, 8192, format, argptr);
+		va_end(argptr);
+
+		if (count >= 0)
+		{
+			printf("%s", buffer);
+		}
+
+		return count;
+	}
+
+	int MutableServiceIo::addHeaderField(const char* format, ...)
+	{
+		int cnt;
+		char buffer[4096];
+		va_list argptr;
+
+		va_start(argptr, format);
+		cnt = vsnprintf(buffer, 4096, format, argptr);
+		va_end(argptr);
+
+		if (cnt >= 0)
+		{
+			printf("%s\r\n", buffer);
+		}
+
+		return cnt;
+	}
+
+	void MutableServiceIo::endHeaderField(void)
+	{
+		printf("\r\n");
+		return;
+	}
+
+	void MutableServiceIo::flush(void)
+	{
+		return;
+	}
+
+	void MutableServiceIo::setPostData(void* postData, size_t size)
+	{
+		free(m_postData);
+		m_postData = copyStr((char*)postData, size);
+	}
+
 }
