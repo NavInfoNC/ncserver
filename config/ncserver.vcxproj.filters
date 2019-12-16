@@ -244,6 +244,9 @@
     <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\node\detail\node_iterator.h">
       <Filter>3rd-party\yaml-cpp\include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\mutable_service_io.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\fcgi_bind.cpp">
@@ -371,6 +374,9 @@
     </ClCompile>
     <ClCompile Include="..\3rd-party\yaml-cpp\src\tag.cpp">
       <Filter>3rd-party\yaml-cpp\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\mutable_service_io.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

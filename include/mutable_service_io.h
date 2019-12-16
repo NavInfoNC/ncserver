@@ -21,21 +21,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "stdafx.h"
-#include "ncserver.h"
+#pragma once
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
+#include "ncserver.h"
 
 namespace ncserver
 {
-	class FCgiServiceIo : public ServiceIo
+	class MutableServiceIo : public ServiceIo
 	{
 	public:
-		FCgiServiceIo(FCGI_FILE* file);
+		MutableServiceIo();
 
-		~FCgiServiceIo(void);
+		virtual ~MutableServiceIo();
 
 		virtual void read(void *buffer, size_t size);
 
@@ -49,7 +46,14 @@ namespace ncserver
 
 		virtual void flush(void);
 
+		void setPostData(void* postData, size_t size);
+
+		void* buffer() { return m_buffer; }
+		size_t bufferSize() { return m_bufferSize; }
+
 	private:
-		FCGI_FILE* m_file;
+		void* m_postData;
+		void* m_buffer;
+		size_t m_bufferSize;
 	};
 }
