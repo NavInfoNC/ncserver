@@ -38,14 +38,13 @@ namespace ncserver
 	MutableServiceIo::MutableServiceIo()
 	{
 		m_postData = _copyStr("", 0);
-		m_buffer = _copyStr("", 0);
-		m_bufferSize = 0;
+		initBuffer();
 	}
 
 	MutableServiceIo::~MutableServiceIo()
 	{
-		free(m_buffer);
 		free(m_postData);
+		cleanupBuffer();
 	}
 
 	void MutableServiceIo::read(void *buffer, size_t size)
@@ -121,4 +120,22 @@ namespace ncserver
 		m_postData = _copyStr((char*)postData, size);
 	}
 
+	void MutableServiceIo::resetBuffer()
+	{
+		cleanupBuffer();
+		initBuffer();
+	}
+
+	void MutableServiceIo::initBuffer()
+	{
+		m_buffer = _copyStr("", 0);
+		m_bufferSize = 0;
+	}
+
+	void MutableServiceIo::cleanupBuffer()
+	{
+		free(m_buffer);
+		m_buffer = NULL;
+		m_bufferSize = 0;
+	}
 }
