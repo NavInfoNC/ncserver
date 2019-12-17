@@ -50,10 +50,12 @@ namespace ncserver
 
 		void* buffer() { return m_buffer; }
 		size_t bufferSize() { return m_bufferSize; }
+		void resetBuffer();
+
+	private:
 		void initBuffer();
 		void cleanupBuffer();
 
-	private:
 		void* m_postData;
 		void* m_buffer;
 		size_t m_bufferSize;

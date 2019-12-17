@@ -12,7 +12,7 @@ TEST(MutableServiceIo, read)
 	io.setPostData((void*)postData, strlen(postData));
 	char* buffer = (char*)malloc(strlen(postData));
 	io.read(buffer, strlen(postData));
-	EXPECT_EQ(strncmp(buffer, postData, strlen(postData)), 0);
+	EXPECT_EQ(strncmp(buffer, postData, io.bufferSize()), 0);
 }
 
 TEST(MutableServiceIo, write)
@@ -20,7 +20,7 @@ TEST(MutableServiceIo, write)
 	MutableServiceIo io;
 	const char* result = "{\"io\":\"MutableServiceIo\"}";
 	io.write((void*)result, strlen(result));
-	EXPECT_EQ(strncmp((char*)io.buffer(), result, strlen(result)), 0);
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, io.bufferSize()), 0);
 }
 
 TEST(MutableServiceIo, print)
@@ -28,7 +28,7 @@ TEST(MutableServiceIo, print)
 	MutableServiceIo io;
 	const char* result = "{\"io\":\"MutableServiceIo\"}";
 	io.print("{\"%s\":\"%s\"}", "io", "MutableServiceIo");
-	EXPECT_EQ(strncmp((char*)io.buffer(), result, strlen(result)), 0);
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, io.bufferSize()), 0);
 }
 
 TEST(MutableServiceIo, headerField)
@@ -40,5 +40,23 @@ TEST(MutableServiceIo, headerField)
 	io.addHeaderField("Content-length: 334");
 	io.endHeaderField();
 	io.write((void*)buffer, strlen(buffer));
-	EXPECT_EQ(strncmp((char*)io.buffer(), result, strlen(result)), 0);
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, io.bufferSize()), 0);
+}
+
+TEST(MutableServiceIo, resetBuffer)
+{
+	MutableServiceIo io;
+	const char* result = "Content-type: application/json\r\nContent-length: 334\r\n\r\n{\"io\":\"MutableServiceIo\"}";
+	const char* buffer = "{\"io\":\"MutableServiceIo\"}";
+	io.addHeaderField("Content-type: application/json");
+	io.addHeaderField("Content-length: 334");
+	io.endHeaderField();
+	io.write((void*)buffer, strlen(buffer));
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, io.bufferSize()), 0);
+	io.resetBuffer();
+	io.addHeaderField("Content-type: application/json");
+	io.addHeaderField("Content-length: 334");
+	io.endHeaderField();
+	io.write((void*)buffer, strlen(buffer));
+	EXPECT_EQ(strncmp((char*)io.buffer(), result, io.bufferSize()), 0);
 }

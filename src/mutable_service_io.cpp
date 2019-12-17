@@ -120,6 +120,12 @@ namespace ncserver
 		m_postData = _copyStr((char*)postData, size);
 	}
 
+	void MutableServiceIo::resetBuffer()
+	{
+		cleanupBuffer();
+		initBuffer();
+	}
+
 	void MutableServiceIo::initBuffer()
 	{
 		m_buffer = _copyStr("", 0);
