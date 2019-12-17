@@ -28,22 +28,10 @@ The main purposes of NcServer are:
 #. to support user-controllable process spawning;
 #. to provide a robust architecture.
 
-
-ncserver是基于fastCGI二次开发的。
-FastCGI是一个支持C语言开发的通用网关接口，通过FastCGI，我们可以直接用C/C++语言开发服务器程序，运行效率高。
-然而FastCGI的接口为了兼容普通CGI。导致接口使用并不非常直观。所以我们进行了二次封装。
-
-NcServer的设计目的为：
-
-* 封装FastCGI。
-* 提供程序的生命周期框架。
-* 提供fork()支持。允许快速复制出服务进程。
-  
-关于fork()支持。是为了适应导航在线服务的特点而设计。因为算路、搜索等服务，都是基于大量静态数据进行的。
-如果多个fcgi进行都去加载大量同样的数据，会浪费许多内存。
-
-所以，可以先由一个进程把静态数据加载完毕之后，再fork()出其它服务进程。
-基于Linux操作系统的COW特性，就可以成倍减少内存占用。
+The reason we support user-controllable process spawning rather than make use of spawn-fcgi's spawning abilility is
+that when processes need to load large static data into memory, using spawn-fcgi's architecture would load data into
+memory for every process. However, with our framework, it is allowed to fork processes after data loading, and 
+therefore thanks for the copy-on-write(COW) technology, memory consumption could be reduced quite a lot.
 
 A Simple Example
 ----------------
