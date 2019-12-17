@@ -53,10 +53,14 @@ TEST(MutableServiceIo, resetBuffer)
 	io.endHeaderField();
 	io.write((void*)buffer, strlen(buffer));
 	EXPECT_EQ(strncmp((char*)io.buffer(), result, io.bufferSize()), 0);
+
 	io.resetBuffer();
+
+	const char* result2 = "Content-type: application/json\r\nContent-length: 446\r\n\r\n{\"io\":\"MutableServiceIo\"}";
+	const char* buffer2 = "{\"io\":\"MutableServiceIo\"}";
 	io.addHeaderField("Content-type: application/json");
-	io.addHeaderField("Content-length: 334");
+	io.addHeaderField("Content-length: 446");
 	io.endHeaderField();
-	io.write((void*)buffer, strlen(buffer));
-	EXPECT_EQ(strncmp((char*)io.buffer(), result, io.bufferSize()), 0);
+	io.write((void*)buffer2, strlen(buffer2));
+	EXPECT_EQ(strncmp((char*)io.buffer(), result2, io.bufferSize()), 0);
 }
