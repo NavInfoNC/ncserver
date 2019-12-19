@@ -114,7 +114,7 @@ namespace ncserver
 		return;
 	}
 
-	void MutableServiceIo::setPostData(void* postData, size_t size)
+	void MutableServiceIo::setPostData(const void* postData, size_t size)
 	{
 		free(m_postData);
 		m_postData = _copyStr((char*)postData, size);

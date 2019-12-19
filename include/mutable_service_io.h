@@ -46,7 +46,7 @@ namespace ncserver
 
 		virtual void flush(void);
 
-		void setPostData(void* postData, size_t size);
+		void setPostData(const void* postData, size_t size);
 
 		void* buffer() { return m_buffer; }
 		size_t bufferSize() { return m_bufferSize; }
