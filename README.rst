@@ -213,7 +213,22 @@ Compile & test steps under Linux
    Query String: city=beijing&keyword=coffee
    city: beijing
    keyword: coffee
-   
+
+Configuration
+^^^^^^^^^^^^^
+
+Each service has a configuration file named ".ncserver.yaml". 
+The format of the file is as below.
+
+.. code-block:: yaml
+
+   server:
+      // worker process count, default as 4
+      workerCount: 8
+
+You can either modify the configuration as needed before starting the service or modify it when the service is on running.
+In the second case, you should run ``ncserverctl reload SERVICE_NAME`` to make it take effect.
+
 ncserverctl
 -----------
 
@@ -237,7 +252,7 @@ Deploy Requirement
    
    a. The name of the executable file MUST be the same as the folder itself.
    b. The name of the configuration file is recommended to be the same as the folder itself as well.
-   c. Each service should contain a test script named as test.py if you want to use the ``test`` subcommand of the ``ncserverctl`` command.
+   c. Each service should contain a test script named "test.py" if you want to use the ``test`` subcommand of the ``ncserverctl`` command.
 
    For example::
    
@@ -245,7 +260,8 @@ Deploy Requirement
          $ ls
          echo-server      // the executable
          echo-server.ini  // the configuration file
-         test.py       // server's test file
+         test.py          // server's test file
+         .ncserver.yaml   // configuration file of the framework
 
 Functions
 ^^^^^^^^^
