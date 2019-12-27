@@ -16,6 +16,8 @@ g_sock_file = ".ncserver.sock"
 if os.path.isfile("/var/run/secrets/kubernetes.io/serviceaccount/namespace"):
     g_sock_file = "sock/.ncserver.sock"
 
+g_default_server_directory = "/etc/ncserver/"
+
 g_signal_num_2_name = dict((getattr(signal, n), n) \
     for n in dir(signal) if n.startswith('SIG') and '_' not in n )
 
@@ -209,7 +211,8 @@ def main():
     log_parser = subparsers.add_parser("chloglvl", help="change the SERVER_NAME log level")
     log_parser.add_argument("-l", "--level", default="error", dest="log_level", help="reset SERVER_NAME log level {debug,info,notice,warning,error,crit,alert,emerg}, default error")
     parser.add_argument("SERVER_NAME", help="module to be operated")
-    parser.add_argument("-d", "--directory", default="/etc/ncserver", dest="server_dir", help="directory where SERVER_NAME resides, default to '/etc/ncserver'")
+    parser.add_argument("-d", "--directory", default=g_default_server_directory, dest="server_dir", 
+        help="directory where SERVER_NAME resides, default to '%s'" % g_default_server_directory)
 
     try:
         args = parser.parse_args()

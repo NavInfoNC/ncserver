@@ -8,6 +8,31 @@ In NavInfo, all our navigation related services(routing, poi searching, traffic 
 
 .. image:: docs/architecture.png
 
+Background Introduction
+-----------------------
+
+**ncserver** is developed based on `fastcgi lib<http://fastcgi.com/>`__.
+
+FastCGI is a common gateway interface which is already supported in so many web servers, nginx for example.
+Any backend server program speaking FastCGI can communicate with web servers, and therefore can process HTTP requests easily.
+With the help of FastCGI, we are able to develop C/C++ web applications, leaving more technical details to the web servers,
+and we can then just focus on business logics.
+
+However, FastCGI was originaly designed to be compatible with CGI and therefore its intefaces are not handy enough.
+And that is the exact reason we develop **ncserver** to make web application development easier.
+
+The main purposes of NcServer are:
+
+#. to hide FastCGI details, provide more handy interfaces;
+#. to provide a common web application framework and life cycle managing abilility;
+#. to support user-controllable process spawning;
+#. to provide a robust architecture.
+
+The reason we support user-controllable process spawning rather than make use of spawn-fcgi's spawning abilility is
+that when processes need to load large static data into memory, using spawn-fcgi's architecture would load data into
+memory for every process. However, with our framework, it is allowed to fork processes after data loading, and 
+therefore thanks for the copy-on-write(COW) technology, memory consumption could be reduced quite a lot.
+
 A Simple Example
 ----------------
 
@@ -115,12 +140,12 @@ Build and Test
   But we think Visual Studio is indispensable for any productive-minded C++ developer.
   So we finish most of the work on Windows and only compile and deploy service on Linux.
 
-Window下编译&测试
-^^^^^^^^^^^^^^^^^
+Compile & test steps under Windows
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-按照以下步骤编译和测试。
+1. Configure dependency/nginx-1.7.2/conf/nginx.conf to make nginx a FastCGI proxy and transfer requests via TCP connection to our backend.
 
-1. 配置dependency/nginx-1.7.2/conf/nginx.conf::
+.. code-block:: bash
 
       location ~ /echo {
             root           html;
@@ -130,20 +155,29 @@ Window下编译&测试
             include        fastcgi_params;
          }
 
-   .. note:: ncserver和nginx之间用FCGI protocol通讯。它可以是TCP，也可以用Unix Domain Socket。
-      本例中采用9009 TCP通讯，下面的Linux部署案例中，采用Unix Domain Socket /tmp/echo.sock。
+.. note:: ncserver communicate with nginx with FCGI protocol. The commmunication can either be built via TCP or Unix Domain Socket.
+   In this case, since we are under Windows platform, TCP becomes our only choice, and we chose 9009 port for example.
+   In the case below where we introduces configuration under Linux, Unix Domain Socket will be used.
 
-2. 启动dependency/nginx-1.7.2/nginx.exe。
+2. Double click dependency/nginx-1.7.2/nginx.exe to start nginx.
 
-   .. warning:: nginx.exe只能双击一次，否则会出现问题。必须用nginx -s stop停止。用nginx -s reload重新加载配置。
+.. note:: 
+   Nginx would run in background. 
+   If you modify the configuration of nginx and want the new configuration to take effect, you should use the ``nginx -s reload`` command.
+   If you want to stop nginx, you can either use ``nginx -s stop`` command or directly kill the nginx processes in Task Manager.
 
-3. 直接打开config的sln文件。编译。按F5运行example。
-4. 运行test.py。或者直接访问http://127.0.0.1/echo?text=abc
+.. warning:: 
+   If you double click nginx more than once, ``nginx -s stop`` command can only be used to stop the nginx processes you started by the last double click.
+   Other processes can only be killed in Task Manager.         
 
-Ubuntu下编译&测试
-^^^^^^^^^^^^^^^^^
+3. Double click config/ncserver.sln, compile it in Visual Studio, and then run the example project.
+4. Run example/test.py, or directly access http://127.0.0.1/echo?text=abc in browser to test the project.
 
-首先，配置nginx。让 Nginx 把请求转发给 Unix Domain Socket。
+Compile & test steps under Linux
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. Install nginx using apt-get or yum (depend on your system). 
+2. Configure nginx as a fastcgi proxy to transfer requests to our backend via Unix Domain Socket。
 
 .. code-block:: bash
 
@@ -157,9 +191,9 @@ Ubuntu下编译&测试
       include        fastcgi_params;
    }
 
-   $ sudo nginx -s reload
+   $ sudo nginx -s reload(or sudo nginx -s start, if nginx is not started yet.)
 
-运行以下命令，编译ncserver的lib和测试程序echo。
+3. Run the following commands to compile ncserver library and the testing program.
 
 .. code-block:: bash
 
@@ -169,37 +203,79 @@ Ubuntu下编译&测试
    $ ncserverctl start echo
    Starting <echo> on domain socket unix:/etc/ncserver/echo/.ncserver.sock
    spawn-fcgi: child spawned successfully: PID: 32592
-   $ curl  "http://127.0.0.1/echo?city=beijing&keyword=coffee"
+
+4. Use curl to test the echo server.
+
+.. code-block:: bash
+
+   $ curl "http://127.0.0.1/echo?city=beijing&keyword=coffee"
    Request-Method: GET
    Query String: city=beijing&keyword=coffee
    city: beijing
    keyword: coffee
-   
+
+Configuration
+^^^^^^^^^^^^^
+
+Each service has a configuration file named ".ncserver.yaml". 
+The format of the file is as below.
+
+.. code-block:: yaml
+
+   server:
+      // worker process count, default as 4
+      workerCount: 8
+
+You can either modify the configuration as needed before starting the service or modify it when the service is on running.
+In the second case, you should run ``ncserverctl reload SERVICE_NAME`` to make it take effect.
+
 ncserverctl
 -----------
 
-`ncserverctl` is the managment program for ncserver services. It's used to start/stop/restart/reload a service.
+`ncserverctl` is a managment tool for ncserver services. It's used to start/stop/restart/reload a service.
 
-.. warning:: Needs docmentation
+System Requirement
+^^^^^^^^^^^^^^^^^^
 
-项目背景
---------
+Linux system with Python 2.7 (2.7.9 or above). 
+And it's recommended that you make a link of the ncserverctl file under '/usr/local/bin', and then you can run ``ncserverctl`` command anywhere.
 
-ncserver是基于fastCGI二次开发的。
-FastCGI是一个支持C语言开发的通用网关接口，通过FastCGI，我们可以直接用C/C++语言开发服务器程序，运行效率高。
-然而FastCGI的接口为了兼容普通CGI。导致接口使用并不非常直观。所以我们进行了二次封装。
+Deploy Requirement
+^^^^^^^^^^^^^^^^^^
 
-NcServer的设计目的为：
+1. All corresponding files of the service should be put inside a seperate folder under the directory specified by the ``g_default_server_dir`` variable in the ncserverctl script.
+   By default, ``g_default_server_dir`` is '/etc/ncserver'.
 
-* 封装FastCGI。
-* 提供程序的生命周期框架。
-* 提供fork()支持。允许快速复制出服务进程。
-  
-关于fork()支持。是为了适应导航在线服务的特点而设计。因为算路、搜索等服务，都是基于大量静态数据进行的。
-如果多个fcgi进行都去加载大量同样的数据，会浪费许多内存。
+   For example, if you have a service which does map matching, you should put all corresponding files of the service into '/etc/ncserver/map-matching-server'.
 
-所以，可以先由一个进程把静态数据加载完毕之后，再fork()出其它服务进程。
-基于Linux操作系统的COW特性，就可以成倍减少内存占用。
+2. The files in each folder must obey the following rules:
+   
+   a. The name of the executable file MUST be the same as the folder itself.
+   b. The name of the configuration file is recommended to be the same as the folder itself as well.
+   c. Each service should contain a test script named "test.py" if you want to use the ``test`` subcommand of the ``ncserverctl`` command.
+
+   For example::
+   
+         $ cd /etc/ncserver/echo-server
+         $ ls
+         echo-server      // the executable
+         echo-server.ini  // the configuration file
+         test.py          // server's test file
+         .ncserver.yaml   // configuration file of the framework
+
+Functions
+^^^^^^^^^
+
+You can run ``ncserverctl -h`` to see detailed help information of the tool.
+
+In brief, you can run ncserverctl as below::
+
+   $ ncserverctl start echo-server
+   $ ncserverctl reload echo-server
+   $ ncserverctl status echo-server
+   $ ncserverctl test echo-server
+   $ ncserverctl stop echo-server
+   $ ncserverctl forcekill echo-server
 
 Troubleshoot
 ------------
