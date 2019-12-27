@@ -223,7 +223,7 @@ The format of the file is as below.
 .. code-block:: yaml
 
    server:
-      // worker process count, default as 4
+      # worker process count, default as 4
       workerCount: 8
 
 You can either modify the configuration as needed before starting the service or modify it when the service is on running.
