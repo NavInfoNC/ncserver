@@ -217,9 +217,49 @@ Compile & test steps under Linux
 ncserverctl
 -----------
 
-`ncserverctl` is the managment program for ncserver services. It's used to start/stop/restart/reload a service.
+`ncserverctl` is a managment tool for ncserver services. It's used to start/stop/restart/reload a service.
 
-.. warning:: Needs docmentation
+System Requirement
+^^^^^^^^^^^^^^^^^^
+
+Linux system with Python 2.7 (2.7.9 or above). 
+And it's recommended that you make a link of the ncserverctl file under '/usr/local/bin', and then you can run ``ncserverctl`` command anywhere.
+
+Deploy Requirement
+^^^^^^^^^^^^^^^^^^
+
+1. All corresponding files of the service should be put inside a seperate folder under the directory specified by the ``g_default_server_dir`` variable in the ncserverctl script.
+   By default, ``g_default_server_dir`` is '/etc/ncserver'.
+
+   For example, if you have a service which does map matching, you should put all corresponding files of the service into '/etc/ncserver/map-matching-server'.
+
+2. The files in each folder must obey the following rules:
+   
+   a. The name of the executable file MUST be the same as the folder itself.
+   b. The name of the configuration file is recommended to be the same as the folder itself as well.
+   c. Each service should contain a test script named as test.py if you want to use the ``test`` subcommand of the ``ncserverctl`` command.
+
+   For example::
+   
+         $ cd /etc/ncserver/echo-server
+         $ ls
+         echo-server      // the executable
+         echo-server.ini  // the configuration file
+         test.py       // server's test file
+
+Functions
+^^^^^^^^^
+
+You can run ``ncserverctl -h`` to see detailed help information of the tool.
+
+In brief, you can run ncserverctl as below::
+
+   $ ncserverctl start echo-server
+   $ ncserverctl reload echo-server
+   $ ncserverctl status echo-server
+   $ ncserverctl test echo-server
+   $ ncserverctl stop echo-server
+   $ ncserverctl forcekill echo-server
 
 Troubleshoot
 ------------
