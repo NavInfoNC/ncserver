@@ -79,8 +79,9 @@ Before going any further, I need to tell you more about what is happening inside
 
                      ---------
                      | start |
-                     ---------                         -------
-                        |                              | end |
+                     ---------
+                        |                              -------
+                        v                              | end |
                     ----------                         -------
                     | fork() |                            ^
                     ----------                            | yes
@@ -100,7 +101,7 @@ Before going any further, I need to tell you more about what is happening inside
                         |                  | wait till it finishes forking |  |
                         |                  | children, then kill the old   |  |
                         |                  | manager process.              |  |
-                        |                  ---------------------------------  |
+                        v                  ---------------------------------  |
                --------------------                       |                   |
                | prepareProcess() | <------------ is manager process ?  -------
                --------------------      no                                yes
@@ -124,7 +125,7 @@ Before going any further, I need to tell you more about what is happening inside
                         |                    | test if any worker is dead,  |
                         |                    | if so, fork a new worker for | <-
                         |                    | supplement.                  |  |
-                        |                    --------------------------------  |  
+                        v                    --------------------------------  |  
                  ------------------                       |                    |  
                  | startService() | <------------- is worker process ?         |  
                  ------------------       yes             |                    |  
