@@ -193,11 +193,14 @@ configure this framework.
 
 Currently, we just support configuration on the worker count.
 
+The file should be like:
+
 .. code-block:: yaml
 
    server:
-       # the value of server.workerCount is an integer indicating the count of 
+       # The value of server.workerCount is an integer indicating the count of 
        # worker processes.
+       # By default, workerCount is 4.
        workerCount: 4
 
 
@@ -208,7 +211,7 @@ From the life cycle diagram above, we see ``prepareProcess()`` and
 ``initUnforkableResouces()`` are invoked before calling ``fork()`` in the manager 
 process.Hence, according to the Copy On Write(COW) feature of the moden linux 
 system, we can load large read-only data in ``prepareProcess()``. Then every worker
- process can access this data, and this data has only one copy in the system memory.
+process can access this data, and this data has only one copy in the system memory.
 
 .. note:: note
 
