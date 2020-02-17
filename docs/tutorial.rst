@@ -405,8 +405,127 @@ If you want to retrieve other headers, for example, if you want to retrieve the
    $http_if_none_match;`` into the location configuration for your service;
 #. Reload nginx to make the modificatin make effect.
 
-After these steps, nginx would recognise the 'If-None-Match' header, storing its value 
-in a variable named ``http_if_none_match``. When a request with this header comes, the
-value of the header would be transfered to our backend service in FastCGI way, and the
-backend can retrieve it with ``request->headerForName("IF_NONE_MATCH")``.
+After these steps, nginx would recognise the 'If-None-Match' header, storing its 
+value in a variable named ``http_if_none_match``. When a request with this header 
+comes, the value of the header would be transfered to our backend service in 
+FastCGI way, and the backend can retrieve it with 
+``request->headerForName("IF_NONE_MATCH")``.
 
+Printing logs
+^^^^^^^^^^^^^
+
+Log printing is very important for any HTTP services. In "nc_log.h" file, we 
+defined an log module named ``ncserver::NcLog``. The NcLog module is based on the
+rsyslog service of Linux system. As for Windows platform, this module just print
+logs onto the screen.
+
+A simple example for usage of the NcLog module is:
+
+.. code-block:: cpp
+
+   class ExampleForLog : public NcServer
+   {
+   public:
+       void query(ServiceIo* io, Request* request)
+       {
+           // logs would be printed with a header in format like:
+           // __FILE__(__LINE__): LOG_LEVEL_STRING: [__FUNCTION__]
+           ASYNC_LOG_INFO("Request received from %s:%s: %s?%s %s.", 
+               request->headerForName("REMOTE_ADDR"),
+               request->headerForName("REMOTE_PORT"),
+               request->documentUri(),
+               request->queryString(),
+               request->requestMethod());
+
+            ASYNC_LOG_DEBUG("This is a log of debug level.");
+            ASYNC_LOG_NOTICE("This is a log of notice level.");
+            ASYNC_LOG_WARNING("This is a log of warning level.");
+            ASYNC_LOG_ERR("This is a log of error level.");
+            ASYNC_LOG_CRIT("This is a log of critical level.");
+            ASYNC_LOG_ALERT("This is a log of alert level.");
+            ASYNC_LOG_EMERG("This is a log of emergency level.");
+
+            ASYNC_RAW_LOG("This log would be output without additional messages.");
+       }
+   };
+
+   int main()
+   {
+       // Set the log tag as Eexample-for-log,
+       // and set the initial log level as warning level.
+       // If the log level is not modified ever since, logs with level lower than 
+       // warning level would be omitted.
+       NcLog::instance().init("example-for-log", LogLevel_warning);
+
+       // Register a signal handler to handle signals binded with log levels,
+       // then user can dynamically change the log level in runtime.
+       // Using ``ncserverctl chloglvl -l LEVEL SERVER_NAME`` command can modify the log
+       // level of the HTTP server whose program name is SERVER_NAME to LEVEL.
+       // For example, if you want to change the log level to debug level, and this server
+       // is named 'example-for-log', you can use 
+       // ``ncserverctl chloglvl -l debug example-for-log`` command.
+       NcLog::instance().registerUpdateLogLevelSignal();
+
+       ExampleForLog server;
+       server.runAndFork(9000);
+   }
+
+Configuration for rsyslog is also required to make this log module work.
+Add an "example-for-log.conf" file under "/etc/rsyslog.d/" directory as follows:
+
+::
+
+   $template ncserverLogFormat, "[%timegenerated%] - %hostname% - %syslogtag% - %msg%\n"
+   :programname, isequal, "example-for-log" /var/log/example-for-log/   example-for-log.log;ncserverLogFormat
+
+And execute ``systemctl restart rsyslog.service`` to make the new configuration
+file take effect.
+
+In the configuration file above, we have defined a log format named as 
+ncserverLogFormat, which would add log time, host name, tag name and process ID 
+before the log message. Then we filter logs with program name 'example-for-log' 
+and output these logs into a file named example-for-log.log under the
+'/var/log/example-for-log/' directory.
+
+Using this configuration, logs of this program may be like (if we define the 
+initial level as debug):
+
+::
+   
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(16): info: [query] Request received from 192.168.0.3:12041: /example?param1=2 GET.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): debug: [query] This is a log of debug level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): notice: [query] This is a log of notice level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): warning: [query] This is a log of warning level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): err: [query] This is a log of error level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): crit: [query] This is a log of critical level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): alert: [query] This is a log of alert level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): emerg: [query] This is a log of emergency level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - This log would be output without additional messages.
+
+In order to control the size of the logs, we highly recommend you to use the Linux
+logrotate service. For example, add 'example-for-log' file under 
+'/etc/logrotate.d/' directory and edited it like:
+
+::
+   /var/log/example-for-log/example-for-log.log
+   {
+       rotate 7
+       maxage 7
+       extension .log
+   
+       dateext
+       dateformat .%Y%m%d
+       dateyesterday
+   
+       daily
+       missingok
+       copytruncate
+       nocompress
+       postrotate
+           reload rsyslog >/dev/null 2>&1 || true
+       endscript
+   }
+
+Then the logrotate service would rename the current log file as 
+'example-for-log.YYYYMMDD.log', where YYYY is the year, MM the month with 2 digits,
+and DD the day with 2 digits. and logs older than one week would be deleted.
