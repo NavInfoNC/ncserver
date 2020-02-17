@@ -471,9 +471,7 @@ A simple example for usage of the NcLog module is:
    }
 
 Configuration for rsyslog is also required to make this log module work.
-Add an "example-for-log.conf" file under "/etc/rsyslog.d/" directory as follows:
-
-::
+Add an "example-for-log.conf" file under "/etc/rsyslog.d/" directory as follows::
 
    $template ncserverLogFormat, "[%timegenerated%] - %hostname% - %syslogtag% - %msg%\n"
    :programname, isequal, "example-for-log" /var/log/example-for-log/   example-for-log.log;ncserverLogFormat
@@ -494,19 +492,18 @@ initial level as debug):
    
    [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(16): info: [query] Request received from 192.168.0.3:12041: /example?param1=2 GET.
    [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): debug: [query] This is a log of debug level.
-   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): notice: [query] This is a log of notice level.
-   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): warning: [query] This is a log of warning level.
-   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): err: [query] This is a log of error level.
-   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): crit: [query] This is a log of critical level.
-   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): alert: [query] This is a log of alert level.
-   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(23): emerg: [query] This is a log of emergency level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(24): notice: [query] This is a log of notice level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(25): warning: [query] This is a log of warning level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(26): err: [query] This is a log of error level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(27): crit: [query] This is a log of critical level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(28): alert: [query] This is a log of alert level.
+   [Feb 17 21:34:47] - localhost - example-for-log[20031] - /home/user/workspace/example-for-log/example-for-log.cpp(29): emerg: [query] This is a log of emergency level.
    [Feb 17 21:34:47] - localhost - example-for-log[20031] - This log would be output without additional messages.
 
 In order to control the size of the logs, we highly recommend you to use the Linux
 logrotate service. For example, add 'example-for-log' file under 
-'/etc/logrotate.d/' directory and edited it like:
+'/etc/logrotate.d/' directory and edited it like::
 
-::
    /var/log/example-for-log/example-for-log.log
    {
        rotate 7
@@ -527,5 +524,5 @@ logrotate service. For example, add 'example-for-log' file under
    }
 
 Then the logrotate service would rename the current log file as 
-'example-for-log.YYYYMMDD.log', where YYYY is the year, MM the month with 2 digits,
+'example-for-log.yyyyMMDD.log', where yyyy is the year, MM the month with 2 digits,
 and DD the day with 2 digits. and logs older than one week would be deleted.
