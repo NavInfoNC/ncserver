@@ -213,8 +213,9 @@ process.Hence, according to the Copy On Write(COW) feature of the moden linux
 system, we can load large read-only data in ``prepareProcess()``. Then every worker
 process can access this data, and this data has only one copy in the system memory.
 
-.. note:: note
+::
 
+   Note:
    Because we are using ``fork()`` here, we should be aware that file descriptors 
    SHOULD NOT be opened here, otherwise all worker processes would share the same 
    fd, as a result of which, operations on this fd in one worker process would 
@@ -356,3 +357,56 @@ associated with the dead worker process.
 
 Apparently, this feature requires you no action. It is naturaly supported by the 
 NcServer framework.
+
+Customized request headers
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+NcServer framework is based on FastCGI, so it follows the FastCGI interface.
+Request headers should be retrieved using the ``ncserver::Request.headerForName()``
+interface. Parameter for this interface is a '_' splited capitalized form of the
+header name. For example, to retrieve the 'Content-Length' header, you should use
+``request->headerForName("CONTENT_LENGTH")``, to retrieve the 'Content-Type' header,
+you should use ``request->headerForName("CONTENT_TYPE")``, etc.
+
+The following headers are supported by default:
+
+* DOCUMENT_ROOT
+* DOCUMENT_URI
+* REQUEST_URI
+
+* REQUEST_METHOD
+* QUERY_STRING
+* CONTENT_TYPE
+* CONTENT_LENGTH
+
+* SERVER_PROTOCOL
+
+* SCRIPT_FILENAME
+* SCRIPT_NAME
+
+* GATEWAY_INTERFACE
+* SERVER_SOFTWARE
+
+* REMOTE_ADDR
+* REMOTE_PORT
+* SERVER_ADDR
+* SERVER_PORT
+* SERVER_NAME
+
+* HTTPS
+
+If you want to retrieve other headers, for example, if you want to retrieve the
+'If-None-Match' header, you should configure nginx first. Steps are shown as follow:
+
+#. Global configuration: edit the fastcgi_params file under nginx directory
+   (e.g. /etc/nginx/fastcgi_params), and append ``fastcgi_param IF_NONE_MATCH
+   $http_if_none_match;`` to the file;
+   or location only configuration: add ``fastcgi_param IF_NONE_MATCH 
+   $http_if_none_match;`` into the location configuration for your service;
+#. Reload nginx to make the modificatin make effect.
+
+After these steps, nginx would recognise the 'If-None-Match' header, storing its value 
+in a variable named ``http_if_none_match``. When a request with this header comes, the
+value of the header would be transfered to our backend service in FastCGI way, and the
+backend can retrieve it with ``request->headerForName("IF_NONE_MATCH")``.
+
