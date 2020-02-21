@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include "fcgi_stdio.h"
 #include <signal.h>
+#include <sys/stat.h>
 #include "ncserver.h"
 #include "fcgi_bind.h"
 #include "fcgi_service_io.h"
@@ -230,35 +231,45 @@ namespace ncserver
 #endif
 	}
 
+	static bool _checkFileExistence(const char* filename)
+	{
+		struct stat s;
+		return (stat("./.ncserver.yaml", &s) == 0) && (s.st_mode & S_IFREG);
+	}
+
 	void NcServer::loadConfigFile()
 	{
 		NcServerConfig* tmpConfig = NcServerConfig::alloc();
 
-		try
+		const char* configFilename = "./.ncserver.yaml";
+		if (_checkFileExistence(configFilename))
 		{
-			YAML::Node root = YAML::LoadFile("./.ncserver.yaml");
-
-			YAML::Node serverNode = root["server"];
-			if (serverNode)
+			try
 			{
-				NcServerConfig::ServerConfig& serverCfg = tmpConfig->server;
+				YAML::Node root = YAML::LoadFile(configFilename);
 
-				YAML::Node workerCountCfg = serverNode["workerCount"];
-				if (workerCountCfg)
+				YAML::Node serverNode = root["server"];
+				if (serverNode)
 				{
-					serverCfg.workerCount = workerCountCfg.as<int>();
-				}
-			}
+					NcServerConfig::ServerConfig& serverCfg = tmpConfig->server;
 
-			release(m_config);
-			m_config = tmpConfig;
-			reset();
-		}
-		// if anything goes wrong during parsing the config file,
-		// the whole file would be ignored.
-		catch (...)
-		{
-			release(tmpConfig);
+					YAML::Node workerCountCfg = serverNode["workerCount"];
+					if (workerCountCfg)
+					{
+						serverCfg.workerCount = workerCountCfg.as<int>();
+					}
+				}
+
+				release(m_config);
+				m_config = tmpConfig;
+				reset();
+			}
+			// if anything goes wrong during parsing the config file,
+			// the whole file would be ignored.
+			catch (...)
+			{
+				release(tmpConfig);
+			}
 		}
 	}
 
