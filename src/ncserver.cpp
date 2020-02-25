@@ -461,6 +461,8 @@ namespace ncserver
 			request.setQueryString(qs);
 
 			query(io, &request);
+
+			FCGI_Finish();
 		}
 		delete io;
 
