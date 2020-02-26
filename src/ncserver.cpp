@@ -462,6 +462,7 @@ namespace ncserver
 
 			query(io, &request);
 
+			io->flush();
 			FCGI_Finish();
 		}
 		delete io;
