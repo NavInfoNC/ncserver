@@ -50,18 +50,12 @@ namespace ncserver
 
 	int FCgiServiceIo::print(const char* format, ...)
 	{
-		int count;
-		char buffer[8192];
+		int count = 0;
 		va_list argptr;
 
 		va_start(argptr, format);
-		count = vsnprintf(buffer, 8192, format, argptr);
+		count = FCGI_vprintf(format, argptr);
 		va_end(argptr);
-
-		if (count >= 0)
-		{
-			FCGI_printf("%s", buffer);
-		}
 
 		return count;
 	}
