@@ -220,7 +220,12 @@ def main():
         sys.exit(1)
 
     server = args.SERVER_NAME
-    program_dir = "%s/%s" %  (args.server_dir, server)
+
+    server_dir = args.server_dir
+    if not server_dir.endswith('/'):
+        server_dir = server_dir + '/'
+
+    program_dir = "%s%s" %  (server_dir, server)
     if not os.path.isdir(program_dir):
         print("No module found with the name %s in %s" % (server, args.server_dir))
         sys.exit(1)
