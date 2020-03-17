@@ -199,7 +199,7 @@ Compile & test steps under Linux
 
    $ python make.py
    $ mkdir /etc/ncserver/echo
-   $ copy echo /etc/ncserver/echo
+   $ cp lib/echo /etc/ncserver/echo
    $ ncserverctl start echo
    Starting <echo> on domain socket unix:/etc/ncserver/echo/.ncserver.sock
    spawn-fcgi: child spawned successfully: PID: 32592
