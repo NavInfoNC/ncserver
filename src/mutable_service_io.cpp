@@ -23,7 +23,7 @@ SOFTWARE.
 */
 #include "stdafx.h"
 #include <cstdarg>
-#include "mutable_service_io.h"
+#include "ncserver/mutable_service_io.h"
 
 namespace ncserver
 {

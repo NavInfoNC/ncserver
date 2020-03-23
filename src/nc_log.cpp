@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
-#include "nc_log.h"
+#include "ncserver/nc_log.h"
 #include "util.h"
 
 #if defined(WIN32)

@@ -26,11 +26,11 @@ SOFTWARE.
 #include "fcgi_stdio.h"
 #include <signal.h>
 #include <sys/stat.h>
-#include "ncserver.h"
+#include "ncserver/ncserver.h"
 #include "fcgi_bind.h"
 #include "fcgi_service_io.h"
 #include "util.h"
-#include "nc_log.h"
+#include "ncserver/nc_log.h"
 #include "yaml-cpp/yaml.h"
 
 #ifndef WIN32

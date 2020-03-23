@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "ncserver.h"
+#include "ncserver/ncserver.h"
 #include "gtest.h"
 
 using namespace ncserver;

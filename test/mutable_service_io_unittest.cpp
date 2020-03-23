@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "gtest.h"
-#include "ncserver.h"
-#include "mutable_service_io.h"
+#include "ncserver/ncserver.h"
+#include "ncserver/mutable_service_io.h"
 
 using namespace ncserver;
 

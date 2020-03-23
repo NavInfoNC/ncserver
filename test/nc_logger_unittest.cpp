@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "ncserver.h"
+#include "ncserver/ncserver.h"
 #include "gtest.h"
-#include "nc_log.h"
+#include "ncserver/nc_log.h"
 
 using namespace ncserver;
 

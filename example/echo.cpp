@@ -1,7 +1,7 @@
 // An example program of ncserver
 #include <stdlib.h>
-#include "ncserver.h"
-#include "nc_log.h"
+#include "ncserver/ncserver.h"
+#include "ncserver/nc_log.h"
 
 using namespace std;
 using namespace ncserver;

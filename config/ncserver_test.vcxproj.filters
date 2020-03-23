@@ -43,17 +43,11 @@
     <ClInclude Include="..\src\util.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\ncserver.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\test\stdafx.h">
       <Filter>test</Filter>
     </ClInclude>
     <ClInclude Include="..\gtest\gtest.h">
       <Filter>3rd-party\gtest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\nc_log.h">
-      <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\3rd-party\fastcgi\include\fastcgi.h">
       <Filter>3rd-party\fcgi\include</Filter>
@@ -253,7 +247,13 @@
     <ClInclude Include="..\3rd-party\yaml-cpp\include\yaml-cpp\yaml.h">
       <Filter>3rd-party\yaml-cpp\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\mutable_service_io.h">
+    <ClInclude Include="..\include\ncserver\mutable_service_io.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ncserver\nc_log.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ncserver\ncserver.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
