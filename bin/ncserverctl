@@ -70,6 +70,7 @@ def start_process(program_name):
         print("%s has already been running" % program_name)
         return 0
     
+    os.environ["NC_SERVER_ENV"] = "1"
     try:
         cmd = "spawn-fcgi -s %s -F 1 -P %s -M 0666 -b 4096 %s" % (g_sock_file, g_pid_file, program_name)
         subprocess.check_output(cmd, shell=True)
