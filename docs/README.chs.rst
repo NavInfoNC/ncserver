@@ -35,7 +35,7 @@
 
          // parse and output query string
          io->print("Query String: %s\n", request->queryString());
-         RequestParameteterIterator* iter = request->getParameterIterator();
+         RequestParameterIterator* iter = request->getParameterIterator();
          while (iter->next())
          {
             io->print("%s: %s\n", iter->name, iter->value);
