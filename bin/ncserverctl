@@ -11,6 +11,7 @@ import imp # local local test suite
 g_pid_file = ".pid"
 g_status_file = ".status"
 g_sock_file = ".ncserver.sock"
+g_default_timeout = 20 * 60  # 20 minutes
 
 # if the server is running in a k8s pod
 if os.path.isfile("/var/run/secrets/kubernetes.io/serviceaccount/namespace"):
@@ -64,8 +65,7 @@ def get_reload_status():
         status = int(f.read())
     return status
 
-def start_process(program_name):
-
+def start_process(program_name, timeout):
     if is_process_running(program_name):
         print("%s has already been running" % program_name)
         return 0
@@ -82,8 +82,15 @@ def start_process(program_name):
         return 1
     else:
         print("Starting <%s> on domain socket unix:%s/%s" % (os.path.basename(program_name), os.path.dirname(program_name), g_sock_file))
+
+        start_time = time.time()
         while not is_process_running(program_name):
             time.sleep(2)
+            cost_time = time.time() - start_time
+            if cost_time > timeout:
+                print("Starting %s timeout(%d), treat as failed" % (program_name, timeout))
+                return 1
+
         file_mode = 0666
         os.chmod(g_sock_file, file_mode)
         open(g_pid_file, "a").close()
@@ -92,17 +99,21 @@ def start_process(program_name):
         os.chmod(g_status_file, file_mode)
         return 0
 
-def stop_process(program_name, signal_num):
+def stop_process(program_name, signal_num, timeout):
 
     if not is_process_running(program_name):
         print("%s has already stopped" % program_name)
         return 0
 
-    if send_signal(program_name, signal_num) != 0:
-        return 1
-    else:
+    if send_signal(program_name, signal_num) == 0:
+        start_time = time.time()
         while is_process_running(program_name):
             time.sleep(2)
+            cost_time = time.time() - start_time
+            if cost_time > timeout:
+                print("Stop %s timeout(%d), treat as failed" % (program_name, timeout))
+                return 1
+
         print("%s stopped" % program_name)
         if os.path.exists(g_pid_file):
             os.remove(g_pid_file)
@@ -111,10 +122,14 @@ def stop_process(program_name, signal_num):
         if os.path.exists(g_status_file):
             os.remove(g_status_file)
         return 0
+    else:
+        return 1
 
-def restart_process(program_name):
-    if not stop_process(program_name, signal.SIGTERM):
-        if not start_process(program_name):
+def restart_process(program_name, timeout):
+    start_time = time.time()
+    if not stop_process(program_name, signal.SIGTERM, timeout):
+        cost_time = time.time() - start_time
+        if not start_process(program_name, timeout - cost_time):
             print("Succeeded in restarting %s" % program_name)
             return 0 
         else:
@@ -124,7 +139,7 @@ def restart_process(program_name):
         print("Failed to restart %s, program cannot be terminated" % program_name)
         return 1
 
-def reload_process(program_name):
+def reload_process(program_name, timeout):
     if not is_process_running(program_name):
         return start_process(program_name)
 
@@ -142,9 +157,15 @@ def reload_process(program_name):
         f.write("1")
 
     reload_status = 1
-
+    start_time = time.time()
     while reload_status == 1:
+        time.sleep(2)
         reload_status = get_reload_status()
+
+        cost_time = time.time() - start_time
+        if cost_time > timeout:
+            print("Reloading %s timeout(%d), treat as failed" % (program_name, timeout))
+            return 1
 
     if reload_status == 2:
         print("Succeeded in Reloading %s" % program_name)
@@ -170,21 +191,21 @@ def reset_log_level(program_name, level):
         print("%s has stopped" % program_name)
     else:
         if level == "debug":
-            send_signal(program_name, 35);
+            send_signal(program_name, 35)
         elif level == "info":
-            send_signal(program_name, 36);
+            send_signal(program_name, 36)
         elif level == "notice":
-            send_signal(program_name, 37);
+            send_signal(program_name, 37)
         elif level == "warning":
-            send_signal(program_name, 38);
+            send_signal(program_name, 38)
         elif level == "error":
-            send_signal(program_name, 39);
+            send_signal(program_name, 39)
         elif level == "crit":
-            send_signal(program_name, 40);
+            send_signal(program_name, 40)
         elif level == "alert":
-            send_signal(program_name, 41);
+            send_signal(program_name, 41)
         elif level == "emerg":
-            send_signal(program_name, 42);
+            send_signal(program_name, 42)
 
 def run_tests(program_dir):
     test_script_path = "%s/test.py" % program_dir
@@ -217,6 +238,8 @@ def main():
     parser.add_argument("SERVER_NAME", help="module to be operated")
     parser.add_argument("-d", "--directory", default=g_default_server_directory, dest="server_dir", 
         help="directory where SERVER_NAME resides, default to '%s'" % g_default_server_directory)
+    parser.add_argument("-t", "--timeout", default=g_default_timeout, dest="timeout", type=int,
+        help="set maximum seconds allowed to spend, default is %s(only for start/stop/restart/reload/forcekill action)" % g_default_timeout)
 
     try:
         args = parser.parse_args()
@@ -224,6 +247,7 @@ def main():
         sys.exit(1)
 
     server = args.SERVER_NAME
+    timeout = int(args.timeout)
 
     server_dir = args.server_dir
     if not server_dir.endswith('/'):
@@ -238,15 +262,15 @@ def main():
     program_name = "%s/%s" % (program_dir, server)
 
     if args.subcommand_name == "start":
-        return start_process(program_name)
+        return start_process(program_name, timeout)
     elif args.subcommand_name == "stop":
-        return stop_process(program_name, signal.SIGTERM)
+        return stop_process(program_name, signal.SIGTERM, timeout)
     elif args.subcommand_name == "forcekill":
-        return stop_process(program_name, signal.SIGKILL)
+        return stop_process(program_name, signal.SIGKILL, timeout)
     elif args.subcommand_name == "reload":
-        return reload_process(program_name)
+        return reload_process(program_name, timeout)
     elif args.subcommand_name == "restart":
-        return restart_process(program_name)
+        return restart_process(program_name, timeout)
     elif args.subcommand_name == "status":
         program_status(program_name, args.verbosity)
     elif args.subcommand_name == "test":
