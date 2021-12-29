@@ -91,7 +91,9 @@ def start_process(program_name, timeout):
                 print("Starting %s timeout(%d), treat as failed" % (program_name, timeout))
                 return 1
 
-        file_mode = 0666
+        # https://stackoverflow.com/a/55590988
+        # 0666
+        file_mode = stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH
         os.chmod(g_sock_file, file_mode)
         open(g_pid_file, "a").close()
         os.chmod(g_pid_file, file_mode)
