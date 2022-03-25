@@ -14,15 +14,30 @@ include_directories(
 SET (CMAKE_CXX_FLAGS "-std=c++11")
 SET (LIB_SUFFIX "")
 
-add_definitions(
-	-DNDEBUG
-	-DLINUX
-	-DAMD64
-	-g
-	-fshort-wchar
-	-fwide-exec-charset=UTF-16LE
-	-m64
-)
+IF(${MAPBAR_PLATFORM} STREQUAL "gnu_arm64")
+    set(LIB_SUFFIX "_gnu_arm64")
+	add_definitions(
+		-DNDEBUG
+		-DLINUX
+		-DAMD64
+		-g
+		-fshort-wchar
+		-fwide-exec-charset=UTF-16LE
+	)
+
+ELSE()
+    set(LIB_SUFFIX "_linux_x64")
+	add_definitions(
+		-DNDEBUG
+		-DLINUX
+		-DAMD64
+		-g
+		-fshort-wchar
+		-fwide-exec-charset=UTF-16LE
+		-m64
+	)
+ENDIF()
+
 
 FILE(GLOB SRC "${BASE_PATH}/src/*.cpp" "${BASE_PATH}/src/*.c")
 FILE(GLOB_RECURSE 3RD_SRC "${BASE_PATH}/3rd-party/*.cpp" "${BASE_PATH}/3rd-party/*.c")
